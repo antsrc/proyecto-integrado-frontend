@@ -1,19 +1,55 @@
-import { NavLink, useLocation } from 'react-router-dom'
-import { Building2, Users, Home } from 'lucide-react'
+import { useState } from "react";
+import { NavLink, useLocation } from "react-router-dom";
+import {
+  Building2,
+  Users,
+  Home,
+  ChevronsLeft,
+  ChevronsRight,
+  Key,
+  Truck,
+  CircleAlert,
+  Hammer
+} from "lucide-react";
 
 const navItems = [
-  { name: 'Inicio', icon: Home, path: '/inicio', isHome: true },
-  { name: 'Inmuebles', icon: Building2, path: '/inmuebles' },
-  { name: 'Clientes', icon: Users, path: '/clientes' },
-]
+  { name: "Inicio", icon: Home, path: "/inicio", isHome: true },
+  { name: "Inmuebles", icon: Building2, path: "/inmuebles" },
+  { name: "Clientes", icon: Users, path: "/clientes" },
+  { name: "Alquileres", icon: Key, path: "/alquileres" },
+  { name: "Proveedores", icon: Truck, path: "/proveedores" }, 
+  { name: "Incidencias", icon: CircleAlert, path: "/incidencias" },
+  { name: "Reformas", icon: Hammer, path: "/reformas" }
+];
 
 export default function Sidebar() {
-  const location = useLocation()
+  const location = useLocation();
+  const [hideText, setHideText] = useState(false);
 
   return (
-    <aside className="w-56 bg-white border-r border-gray-200 flex flex-col">
-      <div className="p-6">
-        <h1 className="text-2xl font-bold text-purple-600">Logotipo</h1>
+    <aside
+      className={`${
+        hideText ? "min-w-[64px]" : "w-56"
+      } bg-white border-r border-gray-200 flex flex-col transition-all duration-300`}
+    >
+      <div
+        className={`h-20 px-4 flex items-center ${
+          hideText ? "justify-center" : "justify-between"
+        }`}
+      >
+        {!hideText && (
+          <h1 className="text-2xl font-bold text-purple-600">Logotipo</h1>
+        )}
+        <button
+          onClick={() => setHideText((prev) => !prev)}
+          className="text-gray-500 hover:text-purple-600 transition"
+        >
+          {hideText ? (
+            <ChevronsRight className="w-5 h-5" />
+          ) : (
+            <ChevronsLeft className="w-5 h-5" />
+          )}
+        </button>
       </div>
 
       <div className="border-b border-gray-200 mx-4" />
@@ -24,13 +60,13 @@ export default function Sidebar() {
           <NavLink
             to="/inicio"
             className={({ isActive }) =>
-              `flex items-center px-4 py-2 text-gray-700 rounded transition text-base font-medium ${
-                isActive ? 'bg-gray-100 text-gray-700' : 'hover:bg-gray-100'
+              `flex items-center px-4 py-2 h-[40px] w-full text-gray-700 rounded transition text-base font-medium ${
+                isActive ? "bg-gray-100 text-gray-700" : "hover:bg-gray-100"
               }`
             }
           >
-            <Home className="w-4 h-4 mr-3" />
-            Inicio
+            <Home className={`w-4 h-4 shrink-0 ${hideText ? "" : "mr-3"}`} />
+            {!hideText && "Inicio"}
           </NavLink>
         </div>
 
@@ -46,19 +82,21 @@ export default function Sidebar() {
                 key={item.name}
                 to={item.path}
                 className={({ isActive }) =>
-                  `flex items-center px-4 py-2 text-gray-700 rounded transition text-base font-medium ${
+                  `flex items-center px-4 py-2 h-[40px] w-full text-gray-700 rounded transition text-base font-medium ${
                     location.pathname.startsWith(item.path) || isActive
-                      ? 'bg-gray-100 text-gray-700'
-                      : 'hover:bg-gray-100'
+                      ? "bg-gray-100 text-gray-700"
+                      : "hover:bg-gray-100"
                   }`
                 }
               >
-                <item.icon className="w-4 h-4 mr-3" />
-                {item.name}
+                <item.icon
+                  className={`w-4 h-4 shrink-0 ${hideText ? "" : "mr-3"}`}
+                />
+                {!hideText && item.name}
               </NavLink>
             ))}
         </div>
       </nav>
     </aside>
-  )
+  );
 }

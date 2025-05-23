@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createInmueble } from "../../../services/inmueblesService";
+import { createProveedor } from "../../../services/proveedoresService";
 import EntityForm from "../../../components/template/EntityForm";
-import { inmueblesFields } from "../../../schemas/inmueblesSchema";
+import { proveedoresFields } from "../../../schemas/proveedoresSchema";
 
-export default function InmueblesNuevo() {
+export default function ProveedoresNuevo() {
   const navigate = useNavigate();
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -12,16 +12,16 @@ export default function InmueblesNuevo() {
   const handleSubmit = async (data) => {
     setIsSubmitting(true);
     try {
-      await createInmueble(data);
-      navigate("/inmuebles", {
-        state: { success: "Inmueble creado con éxito" },
+      await createProveedor(data);
+      navigate("/proveedores", {
+        state: { success: "Proveedor creado con éxito" },
       });
     } catch (error) {
       const backendError = error?.response?.data;
       if (backendError) {
         setError(backendError);
       } else {
-        setError({ message: error.message || "Hubo un error al guardar el inmueble" });
+        setError({ message: error.message || "Hubo un error al guardar el proveedor" });
       }
     } finally {
       setIsSubmitting(false);
@@ -30,10 +30,10 @@ export default function InmueblesNuevo() {
 
   return (
     <EntityForm
-      entityName="inmueble"
-      fields={inmueblesFields}
+      entityName="proveedor"
+      fields={proveedoresFields}
       onSubmit={handleSubmit}
-      onCancel={() => navigate("/inmuebles")}
+      onCancel={() => navigate("/proveedores")}
       error={error}
       onErrorClose={() => setError(null)}
       isSubmitting={isSubmitting}

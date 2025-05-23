@@ -1,14 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  getInmuebleById,
-  updateInmueble,
-  deleteInmueble,
-} from "../../../services/inmueblesService";
+import { getProveedorById, updateProveedor, deleteProveedor } from "../../../services/proveedoresService";
 import EntityForm from "../../../components/template/EntityForm";
-import { inmueblesFields } from "../../../schemas/inmueblesSchema";
+import { proveedoresFields } from "../../../schemas/proveedoresSchema";
 
-export default function InmueblesEditar() {
+export default function ProveedoresEditar() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [initialValues, setInitialValues] = useState(null);
@@ -21,36 +17,34 @@ export default function InmueblesEditar() {
     const fetchData = async () => {
       setIsNotFound(false);
       try {
-        const data = await getInmuebleById(id);
+        const data = await getProveedorById(id);
         setInitialValues(data);
       } catch {
         setIsNotFound(true);
       }
     };
-
     fetchData();
   }, [id]);
 
   const handleSubmit = async (data) => {
     if (data && data._noChanges_) {
-      navigate("/inmuebles", {
-        state: { success: "Inmueble actualizado con éxito" },
+      navigate("/proveedores", {
+        state: { success: "Proveedor actualizado con éxito" },
       });
       return;
     }
     setIsSubmitting(true);
     try {
-      await updateInmueble(id, data);
-      navigate("/inmuebles", {
-        state: { success: "Inmueble actualizado con éxito" },
+      await updateProveedor(id, data);
+      navigate("/proveedores", {
+        state: { success: "Proveedor actualizado con éxito" },
       });
     } catch (error) {
-      console.error("Error al actualizar inmueble:", error);
       const backendError = error?.response?.data;
       if (backendError) {
         setError(backendError);
       } else {
-        setError({ message: error.message || "Hubo un error al actualizar el inmueble." });
+        setError({ message: error.message || "Hubo un error al actualizar el proveedor." });
       }
     } finally {
       setIsSubmitting(false);
@@ -60,12 +54,12 @@ export default function InmueblesEditar() {
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      await deleteInmueble(id);
-      navigate("/inmuebles", {
-        state: { success: "Inmueble eliminado con éxito" },
+      await deleteProveedor(id);
+      navigate("/proveedores", {
+        state: { success: "Proveedor eliminado con éxito" },
       });
     } catch {
-      setError({ message: "Hubo un error al eliminar el inmueble" });
+      setError({ message: "Hubo un error al eliminar el proveedor" });
     } finally {
       setIsDeleting(false);
     }
@@ -73,11 +67,11 @@ export default function InmueblesEditar() {
 
   return (
     <EntityForm
-      entityName="inmueble"
-      fields={inmueblesFields}
+      entityName="proveedor"
+      fields={proveedoresFields}
       initialValues={initialValues}
       onSubmit={handleSubmit}
-      onCancel={() => navigate("/inmuebles")}
+      onCancel={() => navigate("/proveedores")}
       error={error}
       onErrorClose={() => setError(null)}
       isSubmitting={isSubmitting}

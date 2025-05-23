@@ -1,6 +1,2 @@
 @import "tailwindcss";
 
-@theme {
-    --main-dark: #111827;
-    --main-light: #f9fafb;
-}

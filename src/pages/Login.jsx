@@ -1,10 +1,11 @@
-import { useState } from 'react';
-import { useAuth } from '../hooks/useAuth';
+import { useState } from "react";
+import { useAuth } from "../hooks/useAuth";
+import { User, Lock, XCircle } from "lucide-react";
 
 export default function Login() {
   const { login } = useAuth();
-  const [form, setForm] = useState({ nombre: '', contrasena: '' });
-  const [error, setError] = useState('');
+  const [form, setForm] = useState({ nombre: "", contrasena: "" });
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -12,69 +13,82 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     try {
       await login(form);
-      // navigate('/dashboard');
     // eslint-disable-next-line no-unused-vars
     } catch (error) {
-      setError('Nombre o contraseña incorrectos');
+      setError("Nombre o contraseña incorrectos");
     }
   };
 
   return (
-    <>
-    <form onSubmit={handleSubmit}>
-      <h2>Iniciar sesión</h2>
+    <div className="min-h-screen bg-gray-100 flex flex-col justify-center sm:py-12 relative">
+      {/* Error flotante */}
+      {error && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-6">
+          <div className="flex items-center gap-3 bg-red-500 text-white text-sm font-semibold px-4 py-3 rounded-md shadow-md">
+            <XCircle className="w-5 h-5 shrink-0" />
+            <span>{error}</span>
+          </div>
+        </div>
+      )}
 
-      <input
-        type="text"
-        name="nombre"
-        value={form.nombre}
-        onChange={handleChange}
-        placeholder="Nombre de usuario"
-        required
-      />
+      <div className="p-10 xs:p-0 mx-auto md:w-full md:max-w-md z-10">
+        <h1 className="font-bold text-center text-3xl text-purple-600 mb-6">
+          Logotipo
+        </h1>
 
-      <input
-        type="password"
-        name="contrasena"
-        value={form.contrasena}
-        onChange={handleChange}
-        placeholder="Contraseña"
-        required
-      />
+        <div className="bg-white shadow w-full rounded-lg divide-y divide-gray-200">
+          <form onSubmit={handleSubmit} className="px-6 py-8 space-y-6">
+            {/* Usuario */}
+            <div>
+              <label className="font-semibold text-base text-gray-700 pb-1 block">
+                Usuario
+              </label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  name="nombre"
+                  value={form.nombre}
+                  onChange={handleChange}
+                  placeholder="Nombre de usuario"
+                  required
+                  className="pl-10 border border-gray-300 rounded-lg px-4 py-2 text-base w-full text-gray-500"
+                />
+              </div>
+            </div>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+            {/* Contraseña */}
+            <div>
+              <label className="font-semibold text-base text-gray-700 pb-1 block">
+                Contraseña
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="password"
+                  name="contrasena"
+                  value={form.contrasena}
+                  onChange={handleChange}
+                  placeholder="Contraseña"
+                  required
+                  className="pl-10 border border-gray-300 rounded-lg px-4 py-2 text-base w-full text-gray-500"
+                />
+              </div>
+            </div>
 
-      <button type="submit">Entrar</button>
-    </form>
-    <div class="h-screen flex justify-center items-center bg-[var(--main-light)]">
-  <div class="w-full max-w-md px-8">
-    <form class="bg-white rounded-md shadow-2xl p-6">
-      <div class="flex items-center border-2 mb-6 py-2 px-3 rounded-2xl">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-        </svg>
-        <input class="pl-2 w-full outline-none border-none" type="email" name="email" placeholder="Email Address" />
+            {/* Botón */}
+            <button
+              type="submit"
+              className="transition duration-200 bg-purple-600 hover:bg-purple-700 text-white w-full py-3 rounded-lg text-base font-semibold shadow-sm hover:shadow-md"
+            >
+              Iniciar sesión
+            </button>
+          </form>
+        </div>
       </div>
-      <div class="flex items-center border-2 mb-6 py-2 px-3 rounded-2xl">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd"
-            d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-            clip-rule="evenodd" />
-        </svg>
-        <input class="pl-2 w-full outline-none border-none" type="password" name="password" placeholder="Password" />
-      </div>
-      <button type="submit"
-        class="block w-full bg-[var(--main-dark)] mt-5 py-2 rounded-2xl hover:brightness-110 transition-all duration-300 text-white font-semibold">
-        Login
-      </button>
-    </form>
-  </div>
-</div>
-</>
-    
+    </div>
   );
 }
