@@ -32,3 +32,8 @@ export async function deleteProveedor(id) {
   const response = await api.delete(`/proveedores/${id}`);
   return response.data;
 }
+
+export async function getProveedoresIdCodigo() {
+  const response = await api.get('/proveedores/summary');
+  return response.data;
+}

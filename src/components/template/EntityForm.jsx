@@ -26,6 +26,20 @@ const EntityForm = forwardRef(function EntityForm(
   const [formValues, setFormValues] = useState(() =>
     buildInitialState(fields, initialValues)
   );
+  const [activeFields, setActiveFields] = useState(() => {
+    // Por defecto, los campos required están activos.
+    // Si es edición, los no required activos solo si el valor inicial no es null/undefined/"".
+    // Si es nuevo, los no required salen desactivados ("Sin datos" marcado).
+    return fields.reduce((acc, field) => {
+      if (field.required) {
+        acc[field.name] = true;
+      } else {
+        const val = initialValues?.[field.name];
+        acc[field.name] = val !== null && val !== undefined && val !== "";
+      }
+      return acc;
+    }, {});
+  });
   const [showConfirmUpload, setShowConfirmUpload] = useState(false);
   const [pendingFile, setPendingFile] = useState(null);
 
@@ -40,6 +54,24 @@ const EntityForm = forwardRef(function EntityForm(
     // eslint-disable-next-line
   }, [initialValues, fields]);
 
+  useEffect(() => {
+    // Actualizar activeFields si initialValues cambia (edición)
+    if (initialValues && Object.keys(initialValues).length > 0) {
+      setActiveFields(
+        fields.reduce((acc, field) => {
+          if (field.required) {
+            acc[field.name] = true;
+          } else {
+            const val = initialValues?.[field.name];
+            acc[field.name] = val !== null && val !== undefined && val !== "";
+          }
+          return acc;
+        }, {})
+      );
+    }
+    // eslint-disable-next-line
+  }, [initialValues, fields]);
+
   const handleChange = (e, name) => {
     setFormValues((prev) => ({
       ...prev,
@@ -47,14 +79,36 @@ const EntityForm = forwardRef(function EntityForm(
     }));
   };
 
+  const handleToggleField = (name) => {
+    setActiveFields((prev) => {
+      const next = { ...prev, [name]: !prev[name] };
+      // Si se activa "Sin datos" (es decir, el campo se desactiva), poner valor a null
+      if (!next[name]) {
+        setFormValues((fv) => ({ ...fv, [name]: "" }));
+      }
+      return next;
+    });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (onSubmit) {
+      // Filtrar campos no activos: enviar null si el campo está desactivado
+      const filteredValues = { ...formValues };
+      Object.keys(activeFields).forEach((key) => {
+        if (!activeFields[key]) filteredValues[key] = null;
+      });
       if (initialValues && Object.keys(initialValues).length > 0) {
         const dirtyFields = {};
-        for (const key in formValues) {
-          if (formValues[key] !== (initialValues?.[key] ?? "")) {
-            dirtyFields[key] = formValues[key];
+        for (const key in filteredValues) {
+          // Comprobar nulls correctamente
+          const initial = initialValues?.[key];
+          const current = filteredValues[key];
+          // Considerar null, undefined y "" como equivalentes para null
+          const isInitialNull = initial === null || initial === undefined || initial === "";
+          const isCurrentNull = current === null || current === undefined || current === "";
+          if (isInitialNull !== isCurrentNull || (!isCurrentNull && current !== initial)) {
+            dirtyFields[key] = current;
           }
         }
         if (Object.keys(dirtyFields).length === 0) {
@@ -63,7 +117,7 @@ const EntityForm = forwardRef(function EntityForm(
         }
         onSubmit(dirtyFields);
       } else {
-        onSubmit(formValues);
+        onSubmit(filteredValues);
       }
     }
   };
@@ -260,14 +314,25 @@ const EntityForm = forwardRef(function EntityForm(
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {field.label}
               </label>
+              {/* Checkbox para campos no required */}
+              {!field.required && (
+                <label className="flex items-center gap-2 mb-1 text-xs text-gray-500">
+                  <input
+                    type="checkbox"
+                    checked={!activeFields[field.name]}
+                    onChange={() => handleToggleField(field.name)}
+                  />
+                  Sin datos
+                </label>
+              )}
               {field.type === "select" ? (
                 <select
                   value={formValues[field.name]}
                   onChange={(e) => handleChange(e, field.name)}
-                  required={field.required}
+                  required={!field.required && activeFields[field.name] ? true : field.required}
                   readOnly={field.readOnly && isEdit}
-                  disabled={field.disabled && isEdit}
-                  className={`block w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-800 ${field.disabled && isEdit ? 'bg-gray-100' : 'bg-white'}`}
+                  disabled={field.disabled && isEdit || !activeFields[field.name]}
+                  className={`block w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-800 ${field.disabled && isEdit || !activeFields[field.name] ? 'bg-gray-100' : 'bg-white'}`}
                 >
                   <option value="">Seleccione una opción</option>
                   {field.options?.map((opt) => (
@@ -282,13 +347,14 @@ const EntityForm = forwardRef(function EntityForm(
                   name={field.name}
                   value={formValues[field.name]}
                   onChange={(e) => handleChange(e, field.name)}
-                  required={field.required}
+                  required={!field.required && activeFields[field.name] ? true : field.required}
                   readOnly={field.readOnly && isEdit}
                   minLength={field.minLength}
                   maxLength={field.maxLength}
                   min={field.min}
                   max={field.max}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-800 bg-white"
+                  disabled={!activeFields[field.name] || (field.disabled && isEdit)}
+                  className={`block w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-800 ${!activeFields[field.name] || (field.disabled && isEdit) ? 'bg-gray-100' : 'bg-white'}`}
                 />
               )}
             </div>
@@ -313,7 +379,7 @@ const EntityForm = forwardRef(function EntityForm(
           onSubmit={handleDocFormSubmit}
         >
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Subir nuevo {docName} (PDF)
+            Subir {docName} (PDF)
           </label>
           <div className="flex items-center gap-4">
             <input
@@ -335,7 +401,6 @@ const EntityForm = forwardRef(function EntityForm(
         </form>
       )}
 
-      {/* Modal de confirmación para sobreescribir contrato */}
       {showConfirmUpload && (
         <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex justify-center items-center z-50">
           <div className="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full text-center space-y-7 border border-gray-100 animate-fade-in">

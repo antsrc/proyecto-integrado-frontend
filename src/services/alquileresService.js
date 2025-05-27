@@ -58,3 +58,12 @@ export async function existsContrato(id) {
     return false;
   }
 }
+
+export async function getAlquileresIdCodigo() {
+  try {
+    const response = await api.get('/alquileres/summary');
+    return response.data;
+  } catch {
+    throw new Error('Error al obtener los alquileres');
+  }
+}

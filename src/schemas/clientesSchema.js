@@ -7,6 +7,7 @@ export const clientesColumns = [
   { id: "numCuenta", accessorKey: "numCuenta", header: "Nº Cuenta", type: "text" },
   { id: "referidoPor", accessorKey: "referidoPor", header: "Referido por", type: "text" },
   { id: "deuda", accessorKey: "deuda", header: "Deuda (€)", type: "number" },
+  { id: "activo", accessorKey: "activo", header: "Activo", type: "boolean" },
 ];
 
 export const clientesFields = [

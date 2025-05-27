@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import EntityTable from "../../../components/template/EntityTable";
 import { getProveedores } from "../../../services/proveedoresService";
 import { proveedoresColumns } from "../../../schemas/proveedoresSchema";
-import Tooltip from "../../../components/utils/Tooltip";
 
 export default function ProveedoresLista() {
   const [proveedores, setProveedores] = useState([]);
@@ -30,10 +29,7 @@ export default function ProveedoresLista() {
     <EntityTable
       title="Proveedores"
       columns={proveedoresColumns}
-      data={proveedores.map((proveedor) => ({
-        ...proveedor,
-        descripcion: <Tooltip text={proveedor.descripcion} />,
-      }))}
+      data={proveedores}
       status={status}
       error={error}
     />

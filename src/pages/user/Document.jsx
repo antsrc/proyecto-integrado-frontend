@@ -1,8 +1,28 @@
 import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import NotFound from "../NotFound";
 
 export default function Document() {
   const { id, type } = useParams();
-  const url = `http://localhost:3000/uploads/${type}/${id}.pdf`;
+  const url = type === "alquileres"
+    ? `http://localhost:3000/uploads/contratos/${id}.pdf`
+    : `http://localhost:3000/uploads/facturas/${type}/${id}.pdf`;
+  const [exists, setExists] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(url, { method: "HEAD" })
+      .then((res) => {
+        if (!cancelled) setExists(res.ok);
+      })
+      .catch(() => {
+        if (!cancelled) setExists(false);
+      });
+    return () => { cancelled = true; };
+  }, [url]);
+
+  if (exists === false) return <NotFound />;
+  if (exists === null) return null;
 
   return (
     <iframe

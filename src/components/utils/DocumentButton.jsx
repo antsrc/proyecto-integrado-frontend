@@ -1,9 +1,9 @@
 import { FileText } from "lucide-react";
 
-const DocumentButton = ({ id, type = "contrato" }) => {
+const DocumentButton = ({ id, type }) => {
   const handleOpen = () => {
     if (!id) return;
-    window.open(`${window.location.origin}/documentos/${type}s/${id}.pdf`, "_blank", "noopener,noreferrer");
+    window.open(`${window.location.origin}/documentos/${type}/${id}.pdf`, "_blank", "noopener,noreferrer");
   };
 
   return (

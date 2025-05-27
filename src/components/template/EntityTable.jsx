@@ -21,6 +21,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import React from "react";
 import Loading from "../utils/Loading";
 import Toast from "../utils/Toast";
+import BooleanIcon from "../utils/BooleanIcon";
+import Tooltip from "../utils/Tooltip";
+import DocumentButton from "../utils/DocumentButton";
 
 export default function EntityTable({ title, columns, data, status }) {
   const navigate = useNavigate();
@@ -36,6 +39,19 @@ export default function EntityTable({ title, columns, data, status }) {
   const [rowSelection, setRowSelection] = useState({});
   const [showToast, setShowToast] = useState(false);
   const [navigationToast, setNavigationToast] = useState(null);
+
+  // Detecta la primera columna booleana (si existe)
+  const booleanCol = columns.find((col) => col.type === "boolean");
+  const [booleanFilter, setBooleanFilter] = useState("all"); // all | true | false
+
+  // Filtra los datos según el filtro booleano
+  const filteredData = React.useMemo(() => {
+    if (!booleanCol || booleanFilter === "all") return data;
+    return data.filter((row) => {
+      const value = row[booleanCol.id];
+      return booleanFilter === "true" ? value === true : value === false;
+    });
+  }, [data, booleanCol, booleanFilter]);
 
   useEffect(() => {
     if (location.state?.success) {
@@ -73,6 +89,30 @@ export default function EntityTable({ title, columns, data, status }) {
     });
   };
 
+  // Utilidad para formatear fecha a dd-mm-yyyy SOLO para mostrar y buscar
+  const formatDateES = (value) => {
+    if (!value) return "";
+    if (/^\d{2}-\d{2}-\d{4}$/.test(value)) return value;
+    const match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (match) return `${match[3]}-${match[2]}-${match[1]}`;
+    return value;
+  };
+
+  // Filtrado global personalizado: busca en campos string y en fechas como las ve el usuario (dd-mm-yyyy)
+  const customFilteredData = React.useMemo(() => {
+    if (!globalFilter) return filteredData;
+    const filter = globalFilter.toLowerCase();
+    return filteredData.filter((row) => {
+      return columns.some((col) => {
+        const value = row[col.id];
+        if (col.type === "date") {
+          return formatDateES(value).toLowerCase().includes(filter);
+        }
+        return String(value ?? "").toLowerCase().includes(filter);
+      });
+    });
+  }, [filteredData, columns, globalFilter]);
+
   const columnsWithSort = [
     {
       id: "select",
@@ -99,19 +139,26 @@ export default function EntityTable({ title, columns, data, status }) {
     },
     ...columns.map((col) => ({
       ...col,
-      enableSorting: (col.type === "tooltip" || col.type === "doc") ? false : (col.enableSorting ?? true),
+      enableSorting: (col.type === "tooltip" || col.type === "doc" || col.type === "boolean") ? false : (col.enableSorting ?? true),
       sortingFn: col.sortingFn || smartSort,
       cell: ({ getValue }) => {
         const value = getValue();
         if (col.type === "number") return formatNumberES(value);
         if (col.type === "date") {
-          if (!value) return "";
-          if (/^\d{2}-\d{2}-\d{4}$/.test(value)) return value;
-          const match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})/);
-          if (match) return `${match[3]}-${match[2]}-${match[1]}`;
-          return value;
+          return formatDateES(value);
         }
-        if (col.type === "tooltip" || col.type === "doc") return value;
+        if (col.type === "boolean") {
+          return <BooleanIcon value={value} />;
+        }
+        if (col.type === "tooltip") {
+          return <Tooltip text={value} />;
+        }
+        if (col.type === "doc") {
+          if (value && typeof value === "object" && value.id && value.type) {
+            return <DocumentButton id={value.id} type={value.type} />;
+          }
+          return null;
+        }
         return value;
       },
     })),
@@ -132,7 +179,7 @@ export default function EntityTable({ title, columns, data, status }) {
   ];
 
   const table = useReactTable({
-    data,
+    data: customFilteredData,
     columns: columnsWithSort,
     state: { sorting, globalFilter, rowSelection },
     onSortingChange: setSorting,
@@ -160,9 +207,8 @@ export default function EntityTable({ title, columns, data, status }) {
       return;
     }
 
-    // Use columns array for CSV headers (label or id)
     const headers = columns
-      .filter((col) => col.id !== "select" && col.id !== "actions" && col.type !== "doc")
+      .filter((col) => col.id !== "select" && col.id !== "actions" && col.type !== "doc" && col.type !== "boolean")
       .map((col) => col.label || col.header || col.id);
 
     const escapeAndFormat = (value, key) => {
@@ -193,7 +239,7 @@ export default function EntityTable({ title, columns, data, status }) {
       headers.map((header) => escapeAndFormat(header)).join(";"),
       ...rows.map((row) =>
         columns
-          .filter((col) => col.id !== "select" && col.id !== "actions" && col.type !== "doc")
+          .filter((col) => col.id !== "select" && col.id !== "actions" && col.type !== "doc" && col.type !== "boolean")
           .map((col) => escapeAndFormat(row.original[col.id], col.id)).join(";")
       ),
     ];
@@ -256,13 +302,27 @@ export default function EntityTable({ title, columns, data, status }) {
 
       <div className="bg-white px-4 pt-6 pb-4 rounded-lg overflow-x-auto">
         <div className="flex items-center justify-between mb-4">
-          <input
-            type="text"
-            placeholder="Buscar..."
-            className="px-3 py-2 border border-gray-300 rounded-md text-sm w-64 text-gray-800"
-            value={globalFilter ?? ""}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-          />
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              placeholder="Buscar..."
+              className="px-3 py-2 border border-gray-300 rounded-md text-sm w-64 text-gray-800"
+              value={globalFilter ?? ""}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+            />
+            {booleanCol && (
+              <select
+                className="px-2 py-2 border border-gray-300 rounded-md text-sm text-gray-700 bg-white focus:outline-none focus:ring-0 focus:border-gray-400 focus:bg-white transition-colors"
+                value={booleanFilter}
+                onChange={(e) => setBooleanFilter(e.target.value)}
+                style={{ minWidth: 120 }}
+              >
+                <option value="all">Todo</option>
+                <option value="true">{(booleanCol.header || booleanCol.label || booleanCol.id)}s</option>
+                <option value="false">No {(booleanCol.header || booleanCol.label || booleanCol.id).charAt(0).toLowerCase() + (booleanCol.header || booleanCol.label || booleanCol.id).slice(1)}s</option>
+              </select>
+            )}
+          </div>
           <button
             onClick={handleExport}
             className="flex items-center px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md cursor-pointer"
@@ -280,12 +340,12 @@ export default function EntityTable({ title, columns, data, status }) {
                   <th
                     key={header.id}
                     onClick={
-                      header.column.getCanSort() && !["tooltip", "doc"].includes(columns.find((col) => col.id === header.column.id)?.type)
+                      header.column.getCanSort() && !["tooltip", "doc", "boolean"].includes(columns.find((col) => col.id === header.column.id)?.type)
                         ? () => handleSort(header.column.id)
                         : undefined
                     }
                     className={`py-4 text-left text-xs font-medium text-gray-700 uppercase tracking-wider select-none ${
-                      header.column.getCanSort() && !["tooltip", "doc"].includes(columns.find((col) => col.id === header.column.id)?.type)
+                      header.column.getCanSort() && !["tooltip", "doc", "boolean"].includes(columns.find((col) => col.id === header.column.id)?.type)
                         ? 'cursor-pointer'
                         : 'cursor-default'
                     }`}
@@ -295,7 +355,7 @@ export default function EntityTable({ title, columns, data, status }) {
                         header.column.columnDef.header,
                         header.getContext()
                       )}
-                      {header.column.getCanSort() && !["tooltip", "doc"].includes(columns.find((col) => col.id === header.column.id)?.type)
+                      {header.column.getCanSort() && !["tooltip", "doc", "boolean"].includes(columns.find((col) => col.id === header.column.id)?.type)
                         ? renderSortIcon(header.column)
                         : null}
                     </div>

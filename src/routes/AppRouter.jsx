@@ -23,7 +23,13 @@ import ProveedoresLista from "../pages/user/proveedores/ProveedoresLista";
 import ProveedoresNuevo from "../pages/user/proveedores/ProveedoresNuevo";
 import ProveedoresEditar from "../pages/user/proveedores/ProveedoresEditar";
 import Incidencias from "../pages/user/incidencias/Incidencias";
+import IncidenciasLista from "../pages/user/incidencias/IncidenciasLista";
+import IncidenciasNuevo from "../pages/user/incidencias/IncidenciasNuevo";
+import IncidenciasEditar from "../pages/user/incidencias/IncidenciasEditar";
 import Reformas from "../pages/user/reformas/Reformas";
+import ReformasLista from "../pages/user/reformas/ReformasLista";
+import ReformasNuevo from "../pages/user/reformas/ReformasNuevo";
+import ReformasEditar from "../pages/user/reformas/ReformasEditar";
 import Document from "../pages/user/Document";
 
 export default function AppRouter() {
@@ -73,8 +79,17 @@ export default function AppRouter() {
           <Route path="editar/:id" element={<ProveedoresEditar />} />
         </Route>
         
-        <Route path="/incidencias" element={<Incidencias />} />
-        <Route path="/reformas" element={<Reformas />} />
+        <Route path="/incidencias" element={<Incidencias />}>
+          <Route index element={<IncidenciasLista />} />
+          <Route path="nuevo" element={<IncidenciasNuevo />} />
+          <Route path="editar/:id" element={<IncidenciasEditar />} />
+        </Route>
+
+        <Route path="/reformas" element={<Reformas />}>
+          <Route index element={<ReformasLista />} />
+          <Route path="nuevo" element={<ReformasNuevo />} />
+          <Route path="editar/:id" element={<ReformasEditar />} />
+        </Route>
       </Route>
 
       <Route path="/documentos/:type/:id.pdf" element={<Document />} />

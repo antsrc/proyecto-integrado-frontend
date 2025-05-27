@@ -2,13 +2,11 @@ import { useEffect, useState } from "react";
 import EntityTable from "../../../components/template/EntityTable";
 import { getAlquileres, getIdsConContrato } from "../../../services/alquileresService";
 import { alquileresColumns } from "../../../schemas/alquileresSchema";
-import DocumentButton from "../../../components/utils/DocumentButton";
 
 export default function AlquileresLista() {
   const [alquileres, setAlquileres] = useState([]);
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState(null);
-  const [idsConContrato, setIdsConContrato] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -19,8 +17,27 @@ export default function AlquileresLista() {
           getAlquileres(),
           getIdsConContrato(),
         ]);
-        setAlquileres(data);
-        setIdsConContrato(idsContrato);
+        setAlquileres(
+          data.map((alquiler) => {
+            const hoy = new Date();
+            let activo = false;
+            if (!alquiler.fechaBaja) {
+              activo = true;
+            } else {
+              const fechaBaja = new Date(alquiler.fechaBaja);
+              activo = fechaBaja >= new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+            }
+            return {
+              ...alquiler,
+              contrato: idsContrato.includes(alquiler.id)
+                ? { id: alquiler.id, type: "alquileres" }
+                : null,
+              cliente: alquiler.cliente?.codigo || "",
+              inmueble: alquiler.inmueble?.codigo || "",
+              activo,
+            };
+          })
+        );
         setStatus("ok");
       } catch (err) {
         console.error("Error al cargar alquileres:", err);
@@ -35,14 +52,7 @@ export default function AlquileresLista() {
     <EntityTable
       title="Alquileres"
       columns={alquileresColumns}
-      data={alquileres.map((alquiler) => ({
-        ...alquiler,
-        contrato: idsConContrato.includes(alquiler.id)
-          ? <DocumentButton id={alquiler.id} tipo="contrato" />
-          : null,
-        cliente: typeof alquiler.cliente === 'object' && alquiler.cliente !== null ? (alquiler.cliente.codigo) : alquiler.cliente,
-        inmueble: typeof alquiler.inmueble === 'object' && alquiler.inmueble !== null ? (alquiler.inmueble.codigo || alquiler.inmueble.direccion) : alquiler.inmueble,
-      }))}
+      data={alquileres}
       status={status}
       error={error}
     />
