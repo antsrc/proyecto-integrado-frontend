@@ -1,16 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  getReformaById,
-  updateReforma,
-  deleteReforma,
-  updateFactura,
-  existsFactura,
-} from "../../../services/reformasService";
+import { getReparacionById, updateReparacion, deleteReparacion, updateFactura, existsFactura } from "../../../services/reparacionesService";
 import EntityForm from "../../../components/template/EntityForm";
-import { reformasFields } from "../../../schemas/reformasSchema";
+import { reparacionesFields } from "../../../schemas/reparacionesSchema";
 
-export default function ReformasEditar() {
+export default function ReparacionesEditar() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [initialValues, setInitialValues] = useState(null);
@@ -20,15 +14,15 @@ export default function ReformasEditar() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmittingDoc, setIsSubmittingDoc] = useState(false);
   const [existsDoc, setExistsDoc] = useState(false);
-  const [fields] = useState(reformasFields);
+  const [fields] = useState(reparacionesFields);
 
   useEffect(() => {
     setIsNotFound(false);
-    getReformaById(id)
+    getReparacionById(id)
       .then(async (data) => {
         setInitialValues({
           ...data,
-          inmuebleId: "0",
+          incidenciaId: "0",
           proveedorId: "0",
         });
         const exists = await existsFactura(id);
@@ -39,11 +33,11 @@ export default function ReformasEditar() {
       });
   }, [id]);
 
-  const mappedFields = fields.map((field) => {
-    if (field.name === "inmuebleId" && initialValues?.inmueble?.codigo) {
+  const mappedFields = fields.map(field => {
+    if (field.name === "incidenciaId" && initialValues?.incidencia?.codigo) {
       return {
         ...field,
-        options: [{ value: "0", label: initialValues.inmueble.codigo }],
+        options: [{ value: "0", label: initialValues.incidencia.codigo }],
       };
     }
     if (field.name === "proveedorId" && initialValues?.proveedor?.codigo) {
@@ -57,25 +51,23 @@ export default function ReformasEditar() {
 
   const handleSubmit = async (data) => {
     if (data && data._noChanges_) {
-      navigate("/reformas", {
-        state: { success: "Reforma actualizada con éxito" },
+      navigate("/incidencias/reparaciones", {
+        state: { success: "Reparación actualizada con éxito" },
       });
       return;
     }
     setIsSubmitting(true);
     try {
-      await updateReforma(id, data);
-      navigate("/reformas", {
-        state: { success: "Reforma actualizada con éxito" },
+      await updateReparacion(id, data);
+      navigate("/incidencias/reparaciones", {
+        state: { success: "Reparación actualizada con éxito" },
       });
     } catch (error) {
       const backendError = error?.response?.data;
       if (backendError) {
         setError(backendError);
       } else {
-        setError({
-          message: error.message || "Hubo un error al actualizar la reforma.",
-        });
+        setError({ message: error.message || "Hubo un error al actualizar la reparación." });
       }
     } finally {
       setIsSubmitting(false);
@@ -87,15 +79,11 @@ export default function ReformasEditar() {
     setIsSubmittingDoc(true);
     try {
       await updateFactura(id, file);
-      navigate("/reformas", {
+      navigate("/incidencias/reparaciones", {
         state: { success: "Factura actualizada con éxito" },
       });
     } catch (error) {
-      setError({
-        message:
-          error?.response?.data?.message ||
-          "Hubo un error al subir la factura.",
-      });
+      setError({ message: error?.response?.data?.message || "Hubo un error al subir la factura." });
     } finally {
       setIsSubmittingDoc(false);
     }
@@ -104,24 +92,26 @@ export default function ReformasEditar() {
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      await deleteReforma(id);
-      navigate("/reformas", {
-        state: { success: "Reforma eliminada con éxito" },
+      await deleteReparacion(id);
+      navigate("/incidencias/reparaciones", {
+        state: { success: "Reparación eliminada con éxito" },
       });
     } catch {
-      setError({ message: "Hubo un error al eliminar la reforma" });
+      setError({ message: "Hubo un error al eliminar la reparación" });
     } finally {
       setIsDeleting(false);
     }
   };
 
+  if (!initialValues && !isNotFound) return null;
+
   return (
     <EntityForm
-      entityName="reforma"
+      entityName="reparacion"
       fields={mappedFields}
       initialValues={initialValues}
       onSubmit={handleSubmit}
-      onCancel={() => navigate("/reformas")}
+      onCancel={() => navigate("/incidencias/reparaciones")}
       error={error}
       onErrorClose={() => setError(null)}
       isSubmitting={isSubmitting}

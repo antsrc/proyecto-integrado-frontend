@@ -1,13 +1,11 @@
-const BooleanIcon = ({ value }) => {
-  const color = value ? "bg-green-500" : "bg-red-500";
-  const title = value ? "Sí" : "No";
+import { CircleCheck, CircleX } from "lucide-react";
 
-  return (
-    <span
-      title={title}
-      className={`inline-block w-3 h-3 rounded-full ${color}`}
-    />
-  );
+const BooleanIcon = ({ value }) => {
+  const color = value ? "text-green-500" : "text-red-500";
+  const title = value ? "Sí" : "No";
+  const Icon = value ? CircleCheck : CircleX;
+
+  return <Icon className={`w-4 h-4 ${color}`} title={title} />;
 };
 
 export default BooleanIcon;

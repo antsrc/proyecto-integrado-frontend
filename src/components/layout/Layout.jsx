@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
+import { useState } from "react";
 
 const pathToTitle = {
   "/inicio": "Inicio",
@@ -14,6 +15,7 @@ const pathToTitle = {
 
 const Layout = () => {
   const location = useLocation();
+  const [sidebarState, setSidebarState] = useState("open");
 
   const matchedPath = Object.keys(pathToTitle).find((key) =>
     location.pathname.startsWith(key)
@@ -21,12 +23,16 @@ const Layout = () => {
   const title = pathToTitle[matchedPath] || "";
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <Sidebar />
-      <div className="flex flex-col flex-1 min-w-0">
-        <Header title={title} />
-        <div className="overflow-x-auto">
-          <main className="p-6 min-w-[768px]">
+    <div className="flex flex-col h-screen bg-gray-100">
+      <Header
+        onToggleSidebar={(state) => setSidebarState(state)}
+        sidebarState={sidebarState}
+        title={title}
+      />
+      <div className="flex flex-1 min-h-0">
+        {sidebarState !== "closed" && <Sidebar collapsed={sidebarState === "collapsed"} />}
+        <div className="flex flex-col flex-1 min-w-0 overflow-x-auto">
+          <main className="p-6 min-w-[576px]">
             <Outlet />
           </main>
         </div>

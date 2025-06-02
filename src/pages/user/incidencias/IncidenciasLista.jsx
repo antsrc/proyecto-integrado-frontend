@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import EntityTable from "../../../components/template/EntityTable";
 import { incidenciasColumns } from "../../../schemas/incidenciasSchema";
 import { getIncidencias } from "../../../services/incidenciasService";
 
 export default function IncidenciasLista() {
+  const location = useLocation();
   const [incidencias, setIncidencias] = useState([]);
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState(null);
@@ -14,13 +16,13 @@ export default function IncidenciasLista() {
       setError(null);
       try {
         const data = await getIncidencias();
-setIncidencias(
-  data.map((incidencia) => ({
-    ...incidencia,
-    alquiler: incidencia.alquiler?.codigo || "",
-    cliente: incidencia.alquiler?.cliente?.codigo || "",
-    inmueble: incidencia.alquiler?.inmueble?.codigo || "",
-  }))
+        setIncidencias(
+          data.map((incidencia) => ({
+            ...incidencia,
+            alquiler: incidencia.alquiler?.codigo || "",
+            cliente: incidencia.alquiler?.cliente?.codigo || "",
+            inmueble: incidencia.alquiler?.inmueble?.codigo || "",
+          }))
         );
         setStatus("ok");
       } catch (err) {
@@ -38,6 +40,7 @@ setIncidencias(
       data={incidencias}
       status={status}
       error={error}
+      searchDefault={location.state?.searchDefault || ""}
     />
   );
 }

@@ -12,10 +12,10 @@ export const clientesColumns = [
 
 export const clientesFields = [
   { name: "codigo", label: "Código", type: "text", maxLength: 30, required: true },
-  { name: "dni", label: "DNI", type: "text", minLength: 9, maxLength: 9, required: true },
-  { name: "nombreCompleto", label: "Nombre completo", type: "text", maxLength: 100, required: true },
-  { name: "telefono", label: "Teléfono", type: "text", maxLength: 30, required: true },
-  { name: "email", label: "Email", type: "email", maxLength: 100, required: true },
+  { name: "dni", label: "DNI", type: "text", minLength: 9, maxLength: 9, required: true, disabled: true },
+  { name: "nombreCompleto", label: "Nombre completo", type: "text", maxLength: 50, required: true },
+  { name: "telefono", label: "Teléfono", type: "text", maxLength: 15, required: true },
+  { name: "email", label: "Email", type: "email", maxLength: 50, required: true },
   { name: "numCuenta", label: "Número de cuenta", type: "text", maxLength: 30, required: true },
-  { name: "referidoPor", label: "Referido por", type: "text", maxLength: 100, required: false },
+  { name: "referidoPor", label: "Referido por", type: "text", maxLength: 50, required: false },
 ];

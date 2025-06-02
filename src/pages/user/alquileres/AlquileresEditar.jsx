@@ -97,8 +97,12 @@ export default function AlquileresEditar() {
       navigate("/alquileres", {
         state: { success: "Alquiler eliminado con éxito" },
       });
-    } catch {
-      setError({ message: "Hubo un error al eliminar el alquiler" });
+    } catch (error) {
+      if (error?.response?.status === 409) {
+        setError({ message: "No se puede eliminar el alquiler porque hay registros relacionados", statusCode: 400 });
+      } else {
+        setError({ message: "Hubo un error al eliminar el alquiler" });
+      }
     } finally {
       setIsDeleting(false);
     }

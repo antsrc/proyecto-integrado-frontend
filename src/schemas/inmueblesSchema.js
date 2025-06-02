@@ -11,11 +11,11 @@ export const inmueblesColumns = [
 
 export const inmueblesFields = [
   { name: "codigo", label: "Código", type: "text", maxLength: 30, required: true },
-  { name: "direccion", label: "Dirección", type: "text", maxLength: 100, required: true },
+  { name: "direccion", label: "Dirección", type: "text", maxLength: 75, required: true },
   { name: "codPostal", label: "Código Postal", type: "text", minLength: 5, maxLength: 5, required: true },
   { name: "municipio", label: "Municipio", type: "text", maxLength: 30, required: true },
-  { name: "provincia", label: "Provincia", type: "text", maxLength: 30, required: true },
+  { name: "provincia", label: "Provincia", type: "text", maxLength: 20, required: true },
   { name: "tipo", label: "Tipo", type: "text", maxLength: 30, required: true },
   { name: "metrosCuadrados", label: "Metros cuadrados", type: "number", required: true },
-  { name: "refCatastral", label: "Referencia Catastral", type: "text", maxLength: 30, required: true },
+  { name: "refCatastral", label: "Referencia Catastral", type: "text", minLength: 20, maxLength: 20, required: true, disabled: true },
 ];

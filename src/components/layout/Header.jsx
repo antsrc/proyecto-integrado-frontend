@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
-import { User, ChevronDown, LogOut } from "lucide-react";
+import { User, ChevronDown, LogOut, PanelLeftClose, PanelLeft, PanelLeftOpen } from "lucide-react";
 
-export default function Header({ title }) {
+export default function Header({ onToggleSidebar, sidebarState }) {
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -22,9 +22,33 @@ export default function Header({ title }) {
   }, []);
 
   return (
-    <header className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-200 relative">
-      <h2 className="text-2xl font-semibold text-gray-800">{title}</h2>
-
+    <header className="bg-white px-6 py-3 flex items-center justify-between border-b border-gray-200 relative">
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => onToggleSidebar("closed")}
+          className={`text-gray-400 hover:text-gray-600 transition focus:outline-none cursor-pointer rounded-md ${sidebarState === "closed" ? "text-gray-700 shadow-inner" : ""}`}
+          aria-label="Cerrar completamente menú lateral"
+        >
+          <PanelLeftClose className="w-5 h-5" />
+        </button>
+        <button
+          onClick={() => onToggleSidebar("collapsed")}
+          className={`text-gray-400 hover:text-gray-600 transition focus:outline-none cursor-pointer rounded-md ${sidebarState === "collapsed" ? "text-gray-700 shadow-inner" : ""}`}
+          aria-label="Colapsar menú lateral a iconos"
+        >
+          <PanelLeft className="w-5 h-5" />
+        </button>
+        <button
+          onClick={() => onToggleSidebar("open")}
+          className={`text-gray-400 hover:text-gray-600 transition focus:outline-none cursor-pointer rounded-md ${sidebarState === "open" ? "text-gray-700 shadow-inner" : ""}`}
+          aria-label="Abrir menú lateral con texto"
+        >
+          <PanelLeftOpen className="w-5 h-5" />
+        </button>
+      </div>
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+        <h1 className="text-2xl font-bold text-purple-600">Logotipo</h1>
+      </div>
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setOpen(!open)}

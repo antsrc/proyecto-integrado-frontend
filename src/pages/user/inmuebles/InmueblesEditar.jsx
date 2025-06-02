@@ -64,8 +64,12 @@ export default function InmueblesEditar() {
       navigate("/inmuebles", {
         state: { success: "Inmueble eliminado con éxito" },
       });
-    } catch {
-      setError({ message: "Hubo un error al eliminar el inmueble" });
+    } catch (error) {
+      if (error?.response?.status === 409) {
+        setError({ message: "No se puede eliminar el inmueble porque hay registros relacionados", statusCode: 400 });
+      } else {
+        setError({ message: "Hubo un error al eliminar el inmueble" });
+      }
     } finally {
       setIsDeleting(false);
     }

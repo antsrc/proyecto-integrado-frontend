@@ -1,11 +1,8 @@
-import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   Building2,
   Users,
   Home,
-  ChevronsLeft,
-  ChevronsRight,
   Key,
   Truck,
   CircleAlert,
@@ -22,40 +19,16 @@ const navItems = [
   { name: "Reformas", icon: Hammer, path: "/reformas" }
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ collapsed }) {
   const location = useLocation();
-  const [hideText, setHideText] = useState(false);
 
   return (
     <aside
-      className={`${
-        hideText ? "min-w-[64px]" : "w-56"
+      className={`$ {
+        collapsed ? "min-w-[64px] w-[64px]" : "w-56"
       } bg-white border-r border-gray-200 flex flex-col transition-all duration-300`}
     >
-      <div
-        className={`h-20 px-4 flex items-center ${
-          hideText ? "justify-center" : "justify-between"
-        }`}
-      >
-        {!hideText && (
-          <h1 className="text-2xl font-bold text-purple-600">Logotipo</h1>
-        )}
-        <button
-          onClick={() => setHideText((prev) => !prev)}
-          className="text-gray-500 hover:text-purple-600 transition"
-        >
-          {hideText ? (
-            <ChevronsRight className="w-5 h-5" />
-          ) : (
-            <ChevronsLeft className="w-5 h-5" />
-          )}
-        </button>
-      </div>
-
-      <div className="border-b border-gray-200 mx-4" />
-
       <nav className="flex-1 overflow-y-auto pb-4 pt-4">
-        {/* Inicio */}
         <div className="px-4">
           <NavLink
             to="/inicio"
@@ -65,15 +38,11 @@ export default function Sidebar() {
               }`
             }
           >
-            <Home className={`w-4 h-4 shrink-0 ${hideText ? "" : "mr-3"}`} />
-            {!hideText && "Inicio"}
+            <Home className={`w-4 h-4 shrink-0${collapsed ? "" : " mr-3"}`} />
+            {!collapsed && "Inicio"}
           </NavLink>
         </div>
-
-        {/* Separador */}
         <div className="h-[1px] bg-gray-200 mx-4 my-3" />
-
-        {/* Resto de las opciones */}
         <div className="space-y-[6px] px-4">
           {navItems
             .filter((item) => !item.isHome)
@@ -89,10 +58,8 @@ export default function Sidebar() {
                   }`
                 }
               >
-                <item.icon
-                  className={`w-4 h-4 shrink-0 ${hideText ? "" : "mr-3"}`}
-                />
-                {!hideText && item.name}
+                <item.icon className={`w-4 h-4 shrink-0${collapsed ? "" : " mr-3"}`} />
+                {!collapsed && item.name}
               </NavLink>
             ))}
         </div>

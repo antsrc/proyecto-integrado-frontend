@@ -15,5 +15,5 @@ export const alquileresFields = [
   { name: "inmuebleId", label: "Inmueble", type: "select", required: true, disabled: true },
   { name: "fechaAlta", label: "Fecha de alta", type: "date", required: true },
   { name: "fechaBaja", label: "Fecha de baja", type: "date", required: false },
-  { name: "fianza", label: "Fianza (en euros)", type: "number", required: false },
+  { name: "fianza", label: "Fianza (en euros)", type: "number", step: 0.01 },
 ];

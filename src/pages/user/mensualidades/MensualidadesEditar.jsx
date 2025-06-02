@@ -1,16 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  getReformaById,
-  updateReforma,
-  deleteReforma,
-  updateFactura,
-  existsFactura,
-} from "../../../services/reformasService";
+import { getMensualidadById, updateMensualidad, deleteMensualidad, updateFacturaMensualidad, existsFacturaMensualidad } from "../../../services/mensualidadesService";
 import EntityForm from "../../../components/template/EntityForm";
-import { reformasFields } from "../../../schemas/reformasSchema";
+import { mensualidadesFields } from "../../../schemas/mensualidadesSchema";
 
-export default function ReformasEditar() {
+export default function MensualidadesEditar() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [initialValues, setInitialValues] = useState(null);
@@ -20,18 +14,17 @@ export default function ReformasEditar() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmittingDoc, setIsSubmittingDoc] = useState(false);
   const [existsDoc, setExistsDoc] = useState(false);
-  const [fields] = useState(reformasFields);
+  const [fields] = useState(mensualidadesFields);
 
   useEffect(() => {
     setIsNotFound(false);
-    getReformaById(id)
+    getMensualidadById(id)
       .then(async (data) => {
         setInitialValues({
           ...data,
-          inmuebleId: "0",
-          proveedorId: "0",
+          alquilerId: "0",
         });
-        const exists = await existsFactura(id);
+        const exists = await existsFacturaMensualidad(id);
         setExistsDoc(exists);
       })
       .catch(() => {
@@ -39,17 +32,18 @@ export default function ReformasEditar() {
       });
   }, [id]);
 
-  const mappedFields = fields.map((field) => {
-    if (field.name === "inmuebleId" && initialValues?.inmueble?.codigo) {
+  const mappedFields = fields.map(field => {
+    if (field.name === "alquilerId" && initialValues?.alquiler?.codigo) {
       return {
         ...field,
-        options: [{ value: "0", label: initialValues.inmueble.codigo }],
+        options: [{ value: "0", label: initialValues.alquiler.codigo }],
+        disabled: true,
       };
     }
-    if (field.name === "proveedorId" && initialValues?.proveedor?.codigo) {
+    if ((field.name === "fechaPago" || field.name === "formaPago") && initialValues?.[field.name] != null) {
       return {
         ...field,
-        options: [{ value: "0", label: initialValues.proveedor.codigo }],
+        disabled: true,
       };
     }
     return field;
@@ -57,25 +51,23 @@ export default function ReformasEditar() {
 
   const handleSubmit = async (data) => {
     if (data && data._noChanges_) {
-      navigate("/reformas", {
-        state: { success: "Reforma actualizada con éxito" },
+      navigate("/alquileres/mensualidades", {
+        state: { success: "Mensualidad actualizada con éxito" },
       });
       return;
     }
     setIsSubmitting(true);
     try {
-      await updateReforma(id, data);
-      navigate("/reformas", {
-        state: { success: "Reforma actualizada con éxito" },
+      await updateMensualidad(id, data);
+      navigate("/alquileres/mensualidades", {
+        state: { success: "Mensualidad actualizada con éxito" },
       });
     } catch (error) {
       const backendError = error?.response?.data;
       if (backendError) {
         setError(backendError);
       } else {
-        setError({
-          message: error.message || "Hubo un error al actualizar la reforma.",
-        });
+        setError({ message: error.message || "Hubo un error al actualizar la mensualidad." });
       }
     } finally {
       setIsSubmitting(false);
@@ -86,16 +78,12 @@ export default function ReformasEditar() {
     if (!file) return;
     setIsSubmittingDoc(true);
     try {
-      await updateFactura(id, file);
-      navigate("/reformas", {
+      await updateFacturaMensualidad(id, file);
+      navigate("/alquileres/mensualidades", {
         state: { success: "Factura actualizada con éxito" },
       });
     } catch (error) {
-      setError({
-        message:
-          error?.response?.data?.message ||
-          "Hubo un error al subir la factura.",
-      });
+      setError({ message: error?.response?.data?.message || "Hubo un error al subir la factura." });
     } finally {
       setIsSubmittingDoc(false);
     }
@@ -104,24 +92,26 @@ export default function ReformasEditar() {
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      await deleteReforma(id);
-      navigate("/reformas", {
-        state: { success: "Reforma eliminada con éxito" },
+      await deleteMensualidad(id);
+      navigate("/alquileres/mensualidades", {
+        state: { success: "Mensualidad eliminada con éxito" },
       });
     } catch {
-      setError({ message: "Hubo un error al eliminar la reforma" });
+      setError({ message: "Hubo un error al eliminar la mensualidad" });
     } finally {
       setIsDeleting(false);
     }
   };
 
+  if (!initialValues && !isNotFound) return null;
+
   return (
     <EntityForm
-      entityName="reforma"
+      entityName="mensualidad"
       fields={mappedFields}
       initialValues={initialValues}
       onSubmit={handleSubmit}
-      onCancel={() => navigate("/reformas")}
+      onCancel={() => navigate("/alquileres/mensualidades")}
       error={error}
       onErrorClose={() => setError(null)}
       isSubmitting={isSubmitting}

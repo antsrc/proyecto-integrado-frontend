@@ -25,7 +25,7 @@ import BooleanIcon from "../utils/BooleanIcon";
 import Tooltip from "../utils/Tooltip";
 import DocumentButton from "../utils/DocumentButton";
 
-export default function EntityTable({ title, columns, data, status }) {
+export default function EntityTable({ title, columns, data, status, searchDefault = "", booleanSearchDefault, docSearchDefault }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -35,23 +35,47 @@ export default function EntityTable({ title, columns, data, status }) {
     );
     return firstSortable ? [{ id: firstSortable.id, desc: false }] : [];
   });
-  const [globalFilter, setGlobalFilter] = useState("");
+  const [globalFilter, setGlobalFilter] = useState(searchDefault);
+  useEffect(() => {
+    // Si cambia la prop searchDefault y el usuario no ha escrito nada, la aplicamos
+    setGlobalFilter((prev) => (prev ? prev : searchDefault));
+  }, [searchDefault]);
   const [rowSelection, setRowSelection] = useState({});
   const [showToast, setShowToast] = useState(false);
   const [navigationToast, setNavigationToast] = useState(null);
 
   // Detecta la primera columna booleana (si existe)
   const booleanCol = columns.find((col) => col.type === "boolean");
-  const [booleanFilter, setBooleanFilter] = useState("all"); // all | true | false
+  const [booleanFilter, setBooleanFilter] = useState(() => {
+    if (!booleanCol) return "all";
+    if (booleanSearchDefault && booleanCol.id in booleanSearchDefault) {
+      if (booleanSearchDefault[booleanCol.id] === true) return "true";
+      if (booleanSearchDefault[booleanCol.id] === false) return "false";
+    }
+    return "all";
+  }); // all | true | false
+
+  // Detecta la primera columna de documento (factura, contrato, etc)
+  const docCol = columns.find((col) => col.type === "doc");
+  const [docFilter, setDocFilter] = useState(() => docSearchDefault || "all"); // all | with | without
 
   // Filtra los datos según el filtro booleano
   const filteredData = React.useMemo(() => {
-    if (!booleanCol || booleanFilter === "all") return data;
-    return data.filter((row) => {
-      const value = row[booleanCol.id];
-      return booleanFilter === "true" ? value === true : value === false;
-    });
-  }, [data, booleanCol, booleanFilter]);
+    let d = data;
+    if (booleanCol && booleanFilter !== "all") {
+      d = d.filter((row) => {
+        const value = row[booleanCol.id];
+        return booleanFilter === "true" ? value === true : value === false;
+      });
+    }
+    if (docCol && docFilter !== "all") {
+      d = d.filter((row) => {
+        const value = row[docCol.id];
+        return docFilter === "with" ? !!value : !value;
+      });
+    }
+    return d;
+  }, [data, booleanCol, booleanFilter, docCol, docFilter]);
 
   useEffect(() => {
     if (location.state?.success) {
@@ -320,6 +344,18 @@ export default function EntityTable({ title, columns, data, status }) {
                 <option value="all">Todo</option>
                 <option value="true">{(booleanCol.header || booleanCol.label || booleanCol.id)}s</option>
                 <option value="false">No {(booleanCol.header || booleanCol.label || booleanCol.id).charAt(0).toLowerCase() + (booleanCol.header || booleanCol.label || booleanCol.id).slice(1)}s</option>
+              </select>
+            )}
+            {docCol && (
+              <select
+                className="px-2 py-2 border border-gray-300 rounded-md text-sm text-gray-700 bg-white focus:outline-none focus:ring-0 focus:border-gray-400 focus:bg-white transition-colors"
+                value={docFilter}
+                onChange={(e) => setDocFilter(e.target.value)}
+                style={{ minWidth: 120 }}
+              >
+                <option value="all">Todo</option>
+                <option value="with">Con {((docCol.header || docCol.label || docCol.id).charAt(0).toLowerCase() + (docCol.header || docCol.label || docCol.id).slice(1))}</option>
+                <option value="without">Sin {((docCol.header || docCol.label || docCol.id).charAt(0).toLowerCase() + (docCol.header || docCol.label || docCol.id).slice(1))}</option>
               </select>
             )}
           </div>

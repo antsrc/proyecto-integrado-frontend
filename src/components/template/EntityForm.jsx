@@ -43,15 +43,17 @@ const EntityForm = forwardRef(function EntityForm(
   const [showConfirmUpload, setShowConfirmUpload] = useState(false);
   const [pendingFile, setPendingFile] = useState(null);
 
+  const prevInitialValuesRef = useRef(initialValues);
+
   useEffect(() => {
-    // Solo actualizar formValues si initialValues cambia realmente (edición)
-    if (initialValues && Object.keys(initialValues).length > 0) {
-      const newState = buildInitialState(fields, initialValues);
-      if (JSON.stringify(formValues) !== JSON.stringify(newState)) {
-        setFormValues(newState);
-      }
+    // Solo actualizar formValues si initialValues realmente cambian respecto a los previos
+    const prevInitialValues = prevInitialValuesRef.current;
+    const prevString = JSON.stringify(buildInitialState(fields, prevInitialValues));
+    const nextString = JSON.stringify(buildInitialState(fields, initialValues));
+    if (prevString !== nextString) {
+      setFormValues(buildInitialState(fields, initialValues));
+      prevInitialValuesRef.current = initialValues;
     }
-    // eslint-disable-next-line
   }, [initialValues, fields]);
 
   useEffect(() => {
@@ -273,17 +275,14 @@ const EntityForm = forwardRef(function EntityForm(
       <form onSubmit={handleSubmit} className="space-y-6">
         {error &&
           (Array.isArray(error?.message) ? (
-            error.message.map((msg, idx) => (
-              <Toast
-                key={idx}
-                type={error.statusCode === 400 ? "warning" : "error"}
-                message={msg}
-                onClose={onErrorClose}
-              />
-            ))
+            <Toast
+              type={String(error.statusCode).startsWith("4") ? "warning" : "error"}
+              message={error.message[0]}
+              onClose={onErrorClose}
+            />
           ) : (
             <Toast
-              type={error?.statusCode === 400 ? "warning" : "error"}
+              type={String(error?.statusCode).startsWith("4") ? "warning" : "error"}
               message={error?.message || error}
               onClose={onErrorClose}
             />
@@ -321,6 +320,7 @@ const EntityForm = forwardRef(function EntityForm(
                     type="checkbox"
                     checked={!activeFields[field.name]}
                     onChange={() => handleToggleField(field.name)}
+                    disabled={field.disabled && isEdit}
                   />
                   Sin datos
                 </label>
@@ -341,6 +341,19 @@ const EntityForm = forwardRef(function EntityForm(
                     </option>
                   ))}
                 </select>
+              ) : field.type === "textarea" ? (
+                <textarea
+                  name={field.name}
+                  value={formValues[field.name]}
+                  onChange={(e) => handleChange(e, field.name)}
+                  required={!field.required && activeFields[field.name] ? true : field.required}
+                  readOnly={field.readOnly && isEdit}
+                  minLength={field.minLength}
+                  maxLength={field.maxLength}
+                  disabled={!activeFields[field.name] || (field.disabled && isEdit)}
+                  className={`block w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-800 resize-y ${!activeFields[field.name] || (field.disabled && isEdit) ? 'bg-gray-100' : 'bg-white'}`}
+                  rows={2}
+                />
               ) : (
                 <input
                   type={field.type || "text"}
@@ -353,6 +366,7 @@ const EntityForm = forwardRef(function EntityForm(
                   maxLength={field.maxLength}
                   min={field.min}
                   max={field.max}
+                  step={field.type === "number" && field.step ? field.step : undefined}
                   disabled={!activeFields[field.name] || (field.disabled && isEdit)}
                   className={`block w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-800 ${!activeFields[field.name] || (field.disabled && isEdit) ? 'bg-gray-100' : 'bg-white'}`}
                 />

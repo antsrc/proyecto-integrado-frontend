@@ -32,3 +32,12 @@ export async function deleteIncidencia(id) {
   const response = await api.delete(`/incidencias/${id}`);
   return response.data;
 }
+
+export async function getIncidenciasIdCodigo() {
+  try {
+    const response = await api.get('/incidencias/summary');
+    return response.data;
+  } catch {
+    throw new Error('Error al obtener las incidencias');
+  }
+}

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import EntityTable from "../../../components/template/EntityTable";
 import { getAlquileres, getIdsConContrato } from "../../../services/alquileresService";
 import { alquileresColumns } from "../../../schemas/alquileresSchema";
 
 export default function AlquileresLista() {
+  const location = useLocation();
   const [alquileres, setAlquileres] = useState([]);
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState(null);
@@ -55,6 +57,8 @@ export default function AlquileresLista() {
       data={alquileres}
       status={status}
       error={error}
+      searchDefault={location.state?.searchDefault || ""}
+      docSearchDefault={location.state?.docSearchDefault}
     />
   );
 }

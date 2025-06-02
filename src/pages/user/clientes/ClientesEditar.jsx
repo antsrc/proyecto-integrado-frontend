@@ -56,8 +56,12 @@ export default function ClientesEditar() {
       navigate("/clientes", {
         state: { success: "Cliente eliminado con éxito" },
       });
-    } catch {
-      setError({ message: "Hubo un error al eliminar el cliente" });
+    } catch (error) {
+      if (error?.response?.status === 409) {
+        setError({ message: "No se puede eliminar el cliente porque hay registros relacionados", statusCode: 400 });
+      } else {
+        setError({ message: "Hubo un error al eliminar el cliente" });
+      }
     } finally {
       setIsDeleting(false);
     }

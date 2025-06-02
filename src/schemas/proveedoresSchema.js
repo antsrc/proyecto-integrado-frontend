@@ -10,10 +10,10 @@ export const proveedoresColumns = [
 
 export const proveedoresFields = [
   { name: "codigo", label: "Código", type: "text", maxLength: 30, required: true },
-  { name: "cif", label: "CIF", type: "text", maxLength: 30, required: true },
+  { name: "cif", label: "CIF", type: "text", minLength: 9, maxLength: 9, required: true, disabled: true },
   { name: "nombre", label: "Nombre", type: "text", maxLength: 50, required: true },
   { name: "tipo", label: "Tipo", type: "text", maxLength: 30, required: true },
-  { name: "direccion", label: "Dirección", type: "text", maxLength: 100, required: true },
+  { name: "direccion", label: "Dirección", type: "text", maxLength: 75, required: true },
   { name: "telefono", label: "Teléfono", type: "text", maxLength: 30, required: true },
   { name: "descripcion", label: "Descripción", type: "text", maxLength: 100, required: true },
 ];

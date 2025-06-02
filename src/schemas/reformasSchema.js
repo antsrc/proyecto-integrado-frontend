@@ -11,12 +11,12 @@ export const reformasColumns = [
 ];
 
 export const reformasFields = [
-  { name: "codigo", label: "Código", type: "text", maxLength: 50, required: true },
-  { name: "inmuebleId", label: "Inmueble", type: "select", required: true },
-  { name: "proveedorId", label: "Proveedor", type: "select", required: true },
+  { name: "codigo", label: "Código", type: "text", maxLength: 30, required: true },
+  { name: "inmuebleId", label: "Inmueble", type: "select", required: true, disabled: true },
+  { name: "proveedorId", label: "Proveedor", type: "select", required: true, disabled: true },
   { name: "tipo", label: "Tipo", type: "text", maxLength: 30, required: true },
   { name: "fechaInicio", label: "Fecha de inicio", type: "date", required: true },
   { name: "fechaFin", label: "Fecha de fin", type: "date", required: false },
   { name: "importe", label: "Importe (€)", type: "number", required: false },
-  { name: "descripcion", label: "Descripción", type: "text", required: false },
+  { name: "descripcion", label: "Descripción", type: "textarea", required: false },
 ];

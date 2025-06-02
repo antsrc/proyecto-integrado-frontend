@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "../pages/Login";
-import UserDashboard from "../pages/user/UserDashboard";
+import Dashboard from "../pages/user/dashboard/Dashboard";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import NotFound from "../pages/NotFound";
 import PrivateRoute from "./PrivateRoute";
@@ -31,6 +31,16 @@ import ReformasLista from "../pages/user/reformas/ReformasLista";
 import ReformasNuevo from "../pages/user/reformas/ReformasNuevo";
 import ReformasEditar from "../pages/user/reformas/ReformasEditar";
 import Document from "../pages/user/Document";
+import MensualidadesLista from "../pages/user/mensualidades/MensualidadesLista";
+import MensualidadesNuevo from "../pages/user/mensualidades/MensualidadesNuevo";
+import MensualidadesEditar from "../pages/user/mensualidades/MensualidadesEditar";
+import Reparaciones from "../pages/user/reparaciones/Reparaciones";
+import ReparacionesLista from "../pages/user/reparaciones/ReparacionesLista";
+import ReparacionesNuevo from "../pages/user/reparaciones/ReparacionesNuevo";
+import ReparacionesEditar from "../pages/user/reparaciones/ReparacionesEditar";
+import Seguros from "../pages/user/seguros/Seguros";
+import Rentas from "../pages/user/rentas/Rentas";
+import Ibis from "../pages/user/ibis/Ibis";
 
 export default function AppRouter() {
   return (
@@ -53,12 +63,15 @@ export default function AppRouter() {
           </PrivateRoute>
         }
       >
-        <Route path="/inicio" element={<UserDashboard />} />
+        <Route path="/inicio" element={<Dashboard />} />
 
         <Route path="/inmuebles" element={<Inmuebles />}>
           <Route index element={<InmueblesLista />} />
           <Route path="nuevo" element={<InmueblesNuevo />} />
           <Route path="editar/:id" element={<InmueblesEditar />} />
+          <Route path="seguros" element={<Seguros />} />
+          <Route path="rentas" element={<Rentas />} />
+          <Route path="ibis" element={<Ibis />} />
         </Route>
 
         <Route path="/clientes" element={<Clientes />}>
@@ -71,6 +84,11 @@ export default function AppRouter() {
           <Route index element={<AlquileresLista />} />
           <Route path="nuevo" element={<AlquileresNuevo />} />
           <Route path="editar/:id" element={<AlquileresEditar />} />
+          <Route path="mensualidades/*">
+            <Route index element={<MensualidadesLista />} />
+            <Route path="nuevo" element={<MensualidadesNuevo />} />
+            <Route path="editar/:id" element={<MensualidadesEditar />} />
+          </Route>
         </Route>
 
         <Route path="/proveedores" element={<Proveedores />}>
@@ -83,6 +101,11 @@ export default function AppRouter() {
           <Route index element={<IncidenciasLista />} />
           <Route path="nuevo" element={<IncidenciasNuevo />} />
           <Route path="editar/:id" element={<IncidenciasEditar />} />
+          <Route path="reparaciones/*">
+            <Route index element={<ReparacionesLista />} />
+            <Route path="nuevo" element={<ReparacionesNuevo />} />
+            <Route path="editar/:id" element={<ReparacionesEditar />} />
+          </Route>
         </Route>
 
         <Route path="/reformas" element={<Reformas />}>

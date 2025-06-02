@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import EntityTable from "../../../components/template/EntityTable";
 import { getReformas, getIdsConFactura } from "../../../services/reformasService";
 import { reformasColumns } from "../../../schemas/reformasSchema";
 
 export default function ReformasLista() {
+  const location = useLocation();
   const [reformas, setReformas] = useState([]);
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState(null);
@@ -41,6 +43,7 @@ export default function ReformasLista() {
       data={reformas}
       status={status}
       error={error}
+      docSearchDefault={location.state?.docSearchDefault}
     />
   );
 }

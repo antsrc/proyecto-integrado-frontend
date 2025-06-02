@@ -1,27 +1,48 @@
 import { NavLink, useLocation } from "react-router-dom"
 
-export default function EntitySubnav({ items }) {
+export default function Subnav({ items }) {
   const location = useLocation()
 
+  const match = location.pathname.match(/^\/(\w+)/)
+  const basePath = match ? `/${match[1]}` : ""
+
+  const isTabActive = (to) => {
+    if (to === ".") {
+      return (
+        location.pathname === basePath ||
+        location.pathname === basePath + "/" ||
+        location.pathname.startsWith(basePath + "/nuevo") ||
+        location.pathname.startsWith(basePath + "/editar")
+      )
+    }
+    const childPath = `${basePath}/${to}`.replace(/\/$/, "")
+    return (
+      location.pathname === childPath ||
+      location.pathname.startsWith(childPath + "/")
+    )
+  }
+
   return (
-    <nav className="flex gap-4 border-b border-gray-200 mb-6">
-      {items.map(({ label, to, icon: Icon }) => (
-        <NavLink
-          key={to}
-          to={to}
-          className={({ isActive }) =>
-            `flex items-center gap-2 px-3 py-2 text-sm font-medium transition rounded-t-md ${
-              isActive || location.pathname.endsWith(to)
-                ? "text-purple-600 border-b-2 border-purple-600 bg-gray-50"
-                : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
-            }`
-          }
-          end
-        >
-          <Icon className="w-4 h-4" />
-          {label}
-        </NavLink>
-      ))}
+    <nav className="border-b border-gray-200 mb-6">
+      <ul className="flex justify-start space-x-10 text-sm font-medium text-gray-500">
+        {items.map(({ label, to }) => (
+          <li key={to}>
+            <NavLink
+              to={to}
+              className={() =>
+                `relative inline-block pb-3 transition-colors duration-200 ${
+                  isTabActive(to)
+                    ? "text-black after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-black"
+                    : "hover:text-gray-800"
+                }`
+              }
+              end
+            >
+              {label}
+            </NavLink>
+          </li>
+        ))}
+      </ul>
     </nav>
   )
 }

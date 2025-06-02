@@ -58,8 +58,12 @@ export default function ProveedoresEditar() {
       navigate("/proveedores", {
         state: { success: "Proveedor eliminado con éxito" },
       });
-    } catch {
-      setError({ message: "Hubo un error al eliminar el proveedor" });
+    } catch (error) {
+      if (error?.response?.status === 409) {
+        setError({ message: "No se puede eliminar el proveedor porque hay registros relacionados", statusCode: 400 });
+      } else {
+        setError({ message: "Hubo un error al eliminar el proveedor" });
+      }
     } finally {
       setIsDeleting(false);
     }

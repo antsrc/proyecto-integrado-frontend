@@ -13,5 +13,5 @@ export const incidenciasFields = [
   { name: "codigo", label: "Código", type: "text", maxLength: 30, required: true },
   { name: "alquilerId", label: "Alquiler", type: "select", required: true },
   { name: "tipo", label: "Tipo", type: "text", maxLength: 30, required: true },
-  { name: "descripcion", label: "Descripción", type: "text", maxLength: 100, required: true },
+  { name: "descripcion", label: "Descripción", type: "textarea", maxLength: 100, required: true },
 ];
