@@ -18,5 +18,5 @@ export const reformasFields = [
   { name: "fechaInicio", label: "Fecha de inicio", type: "date", required: true },
   { name: "fechaFin", label: "Fecha de fin", type: "date", required: false },
   { name: "importe", label: "Importe (€)", type: "number", required: false },
-  { name: "descripcion", label: "Descripción", type: "textarea", required: false },
+  { name: "descripcion", label: "Descripción", type: "textarea", maxLength: 500, required: false },
 ];

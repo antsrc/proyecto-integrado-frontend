@@ -78,7 +78,7 @@ export function IncidenciasBox({ incidencias }) {
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-6">
+    <div className="bg-white rounded-lg px-6 py-6 shadow-sm">
       <div className="flex items-center gap-3 mb-4">
         <div
           className={`rounded-full flex items-center justify-center w-10 h-10 ${

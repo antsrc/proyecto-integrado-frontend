@@ -24,7 +24,7 @@ export function AlquileresBox({ alquileresFinalizando }) {
     return fechaA - fechaB;
   });
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-6">
+    <div className="bg-white rounded-lg px-6 py-6 shadow-sm">
       <h2 className="text-lg font-semibold mb-4">Alquileres finalizando</h2>
       {ordenados.length > 0 ? (
         <ul className="divide-y divide-gray-100">

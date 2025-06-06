@@ -3,24 +3,14 @@ import Sidebar from "./Sidebar";
 import Header from "./Header";
 import { useState } from "react";
 
-const pathToTitle = {
-  "/inicio": "Inicio",
-  "/inmuebles": "Inmuebles",
-  "/clientes": "Clientes",
-  "/alquileres": "Alquileres",
-  "/proveedores": "Proveedores",
-  "/incidencias": "Incidencias",
-  "/reformas": "Reformas",
-};
-
-const Layout = () => {
+const Layout = ({ pathToTitle, sidebarItems }) => {
   const location = useLocation();
   const [sidebarState, setSidebarState] = useState("open");
 
-  const matchedPath = Object.keys(pathToTitle).find((key) =>
-    location.pathname.startsWith(key)
-  );
-  const title = pathToTitle[matchedPath] || "";
+  const matchedPath = pathToTitle
+    ? Object.keys(pathToTitle).find((key) => location.pathname.startsWith(key))
+    : null;
+  const title = (pathToTitle && matchedPath) ? pathToTitle[matchedPath] : "";
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
@@ -30,7 +20,9 @@ const Layout = () => {
         title={title}
       />
       <div className="flex flex-1 min-h-0">
-        {sidebarState !== "closed" && <Sidebar collapsed={sidebarState === "collapsed"} />}
+        {sidebarState !== "closed" && (
+          <Sidebar collapsed={sidebarState === "collapsed"} navItems={sidebarItems} />
+        )}
         <div className="flex flex-col flex-1 min-w-0 overflow-x-auto">
           <main className="p-6 min-w-[576px]">
             <Outlet />

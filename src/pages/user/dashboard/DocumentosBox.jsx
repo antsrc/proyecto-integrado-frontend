@@ -36,7 +36,7 @@ export function DocumentosBox({ registrosSinDocumento }) {
     },
   ];
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-6">
+    <div className="bg-white rounded-lg px-6 py-6 shadow-sm">
       <h2 className="text-lg font-semibold mb-4">Registros sin documento</h2>
       <ul className="divide-y divide-gray-100">
         {items.map((item) =>

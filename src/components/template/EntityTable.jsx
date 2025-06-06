@@ -2,7 +2,6 @@ import {
   useReactTable,
   getCoreRowModel,
   getSortedRowModel,
-  getFilteredRowModel,
   flexRender,
 } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
@@ -107,10 +106,13 @@ export default function EntityTable({ title, columns, data, status, searchDefaul
     if (value == null || value === "") return "";
     const number = parseFloat(value);
     if (isNaN(number)) return value;
-    return number.toLocaleString("es-ES", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
+    // Redondea a dos decimales y separa parte entera y decimal
+    const [entero, decimales] = number
+      .toFixed(2)
+      .split(".");
+    // Inserta puntos cada tres cifras desde la derecha, incluso para cuatro cifras
+    const enteroConPuntos = entero.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    return `${enteroConPuntos},${decimales}`;
   };
 
   // Utilidad para formatear fecha a dd-mm-yyyy SOLO para mostrar y buscar
@@ -122,7 +124,7 @@ export default function EntityTable({ title, columns, data, status, searchDefaul
     return value;
   };
 
-  // Filtrado global personalizado: busca en campos string y en fechas como las ve el usuario (dd-mm-yyyy)
+  // Filtrado global personalizado: busca en campos string y fechas (dd-mm-yyyy), ignora columnas number
   const customFilteredData = React.useMemo(() => {
     if (!globalFilter) return filteredData;
     const filter = globalFilter.toLowerCase();
@@ -131,6 +133,10 @@ export default function EntityTable({ title, columns, data, status, searchDefaul
         const value = row[col.id];
         if (col.type === "date") {
           return formatDateES(value).toLowerCase().includes(filter);
+        }
+        if (col.type === "number") {
+          // Ignora columnas numéricas en la búsqueda global
+          return false;
         }
         return String(value ?? "").toLowerCase().includes(filter);
       });
@@ -166,8 +172,12 @@ export default function EntityTable({ title, columns, data, status, searchDefaul
       enableSorting: (col.type === "tooltip" || col.type === "doc" || col.type === "boolean") ? false : (col.enableSorting ?? true),
       sortingFn: col.sortingFn || smartSort,
       cell: ({ getValue }) => {
-        const value = getValue();
-        if (col.type === "number") return formatNumberES(value);
+        let value = getValue();
+        if (col.type === "number") {
+          // Solo convierte a número si el valor es numérico o string numérico, sin manipular separadores
+          const num = typeof value === "number" ? value : (value !== null && value !== undefined && value !== "" && !isNaN(Number(value))) ? Number(value) : value;
+          return formatNumberES(num);
+        }
         if (col.type === "date") {
           return formatDateES(value);
         }
@@ -210,7 +220,6 @@ export default function EntityTable({ title, columns, data, status, searchDefaul
     onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     enableRowSelection: true,
     getRowId: (row) => row.id,
     maxSorting: 1,
@@ -324,7 +333,7 @@ export default function EntityTable({ title, columns, data, status, searchDefaul
         </button>
       </div>
 
-      <div className="bg-white px-4 pt-6 pb-4 rounded-lg overflow-x-auto">
+      <div className="bg-white px-4 pt-6 pb-4 rounded-lg overflow-x-auto shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <input
@@ -450,7 +459,7 @@ export default function EntityTable({ title, columns, data, status, searchDefaul
                     {row.getVisibleCells().map((cell) => (
                       <td
                         key={cell.id}
-                        className="py-4 whitespace-nowrap text-sm text-gray-500"
+                        className="py-4 px-4 whitespace-nowrap text-sm text-gray-500"
                       >
                         {flexRender(
                           cell.column.columnDef.cell,

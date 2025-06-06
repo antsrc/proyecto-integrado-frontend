@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
-import { User, ChevronDown, LogOut, PanelLeftClose, PanelLeft, PanelLeftOpen } from "lucide-react";
+import { User, ShieldUser, ChevronDown, LogOut, PanelLeftClose, PanelLeft, PanelLeftOpen } from "lucide-react";
 
 export default function Header({ onToggleSidebar, sidebarState }) {
   const { user, logout } = useAuth();
@@ -54,7 +54,11 @@ export default function Header({ onToggleSidebar, sidebarState }) {
           onClick={() => setOpen(!open)}
           className="flex items-center space-x-2 text-sm text-gray-700 cursor-pointer transition"
         >
-          <User className="w-5 h-5" />
+          {user?.rol === "admin" ? (
+            <ShieldUser className="w-5 h-5" />
+          ) : (
+            <User className="w-5 h-5" />
+          )}
           <span>{user?.nombre || "Usuario"}</span>
           <ChevronDown className="w-4 h-4" />
         </button>

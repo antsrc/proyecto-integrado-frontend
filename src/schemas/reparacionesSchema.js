@@ -12,5 +12,5 @@ export const reparacionesFields = [
   { name: "proveedorId", label: "Proveedor", type: "select", required: true, disabled: true },
   { name: "fechaFin", label: "Fecha de fin", type: "date", required: true, disabled: true },
   { name: "importe", label: "Importe (en euros)", type: "number", required: true, disabled: true },
-  { name: "descripcion", label: "Descripción", type: "textarea", required: true },
+  { name: "descripcion", label: "Descripción", type: "textarea", maxLength: 500, required: true },
 ];

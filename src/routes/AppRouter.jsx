@@ -5,7 +5,8 @@ import AdminDashboard from "../pages/admin/AdminDashboard";
 import NotFound from "../pages/NotFound";
 import PrivateRoute from "./PrivateRoute";
 import PublicOnlyRoute from "./PublicOnlyRoute";
-import Layout from "../components/layout/Layout";
+import UserLayout from "../components/layout/UserLayout";
+import AdminLayout from "../components/layout/AdminLayout";
 import InmueblesNuevo from "../pages/user/inmuebles/InmueblesNuevo";
 import InmueblesEditar from "../pages/user/inmuebles/InmueblesEditar";
 import Inmuebles from "../pages/user/inmuebles/Inmuebles";
@@ -34,13 +35,15 @@ import Document from "../pages/user/Document";
 import MensualidadesLista from "../pages/user/mensualidades/MensualidadesLista";
 import MensualidadesNuevo from "../pages/user/mensualidades/MensualidadesNuevo";
 import MensualidadesEditar from "../pages/user/mensualidades/MensualidadesEditar";
-import Reparaciones from "../pages/user/reparaciones/Reparaciones";
 import ReparacionesLista from "../pages/user/reparaciones/ReparacionesLista";
 import ReparacionesNuevo from "../pages/user/reparaciones/ReparacionesNuevo";
 import ReparacionesEditar from "../pages/user/reparaciones/ReparacionesEditar";
 import Seguros from "../pages/user/seguros/Seguros";
 import Rentas from "../pages/user/rentas/Rentas";
 import Ibis from "../pages/user/ibis/Ibis";
+import AuditLogs from "../pages/admin/AuditLogs";
+import ErrorLogs from "../pages/admin/ErrorLogs";
+import Users from "../pages/admin/Users";
 
 export default function AppRouter() {
   return (
@@ -59,7 +62,7 @@ export default function AppRouter() {
       <Route
         element={
           <PrivateRoute requiredRole="user">
-            <Layout />
+            <UserLayout />
           </PrivateRoute>
         }
       >
@@ -115,16 +118,27 @@ export default function AppRouter() {
         </Route>
       </Route>
 
-      <Route path="/documentos/:type/:id.pdf" element={<Document />} />
-
       <Route
-        path="/admin"
+        path="/documentos/:type/:id.pdf"
         element={
-          <PrivateRoute requiredRole="admin">
-            <AdminDashboard />
+          <PrivateRoute requiredRole="user">
+            <Document />
           </PrivateRoute>
         }
       />
+
+      <Route
+        element={
+          <PrivateRoute requiredRole="admin">
+            <AdminLayout />
+          </PrivateRoute>
+        }
+      >
+        <Route path="/admin" index element={<AdminDashboard />} />
+        <Route path="/usuarios" element={<Users />} />
+        <Route path="/audit-logs" element={<AuditLogs />} />
+        <Route path="/error-logs" element={<ErrorLogs />} />
+      </Route>
 
       <Route
         path="*"
