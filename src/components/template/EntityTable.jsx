@@ -389,7 +389,7 @@ export default function EntityTable({ title, columns, data, status, searchDefaul
                         ? () => handleSort(header.column.id)
                         : undefined
                     }
-                    className={`py-4 text-left text-xs font-medium text-gray-700 uppercase tracking-wider select-none ${
+                    className={`py-4 px-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider select-none ${
                       header.column.getCanSort() && !["tooltip", "doc", "boolean"].includes(columns.find((col) => col.id === header.column.id)?.type)
                         ? 'cursor-pointer'
                         : 'cursor-default'
@@ -459,7 +459,7 @@ export default function EntityTable({ title, columns, data, status, searchDefaul
                     {row.getVisibleCells().map((cell) => (
                       <td
                         key={cell.id}
-                        className="py-4 px-4 whitespace-nowrap text-sm text-gray-500"
+                        className="py-4 px-2 whitespace-nowrap text-sm text-gray-500"
                       >
                         {flexRender(
                           cell.column.columnDef.cell,
