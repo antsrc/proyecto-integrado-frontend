@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { createReparacion } from "../../../services/reparacionesService";
 import { getIncidenciasIdCodigo } from "../../../services/incidenciasService";
 import { getProveedoresIdCodigo } from "../../../services/proveedoresService";
@@ -8,13 +8,9 @@ import { reparacionesFields } from "../../../schemas/reparacionesSchema";
 
 export default function ReparacionesNuevo() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const incidenciaPreseleccionada = location.state?.incidencia;
-  const proveedorPreseleccionado = location.state?.proveedor;
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fields, setFields] = useState(reparacionesFields);
-  const [initialValues, setInitialValues] = useState({});
 
   useEffect(() => {
     async function fetchOptions() {
@@ -26,20 +22,6 @@ export default function ReparacionesNuevo() {
         setFields((prev) =>
           prev.map((field) => {
             if (field.name === "incidenciaId") {
-              if (incidenciaPreseleccionada?.id) {
-                return {
-                  ...field,
-                  options: [
-                    {
-                      value: incidenciaPreseleccionada.id,
-                      label:
-                        incidenciaPreseleccionada.codigo ||
-                        incidenciaPreseleccionada.id,
-                    },
-                  ],
-                  disabled: true,
-                };
-              }
               return {
                 ...field,
                 options: incidencias.map((i) => ({
@@ -49,20 +31,6 @@ export default function ReparacionesNuevo() {
               };
             }
             if (field.name === "proveedorId") {
-              if (proveedorPreseleccionado?.id) {
-                return {
-                  ...field,
-                  options: [
-                    {
-                      value: proveedorPreseleccionado.id,
-                      label:
-                        proveedorPreseleccionado.codigo ||
-                        proveedorPreseleccionado.id,
-                    },
-                  ],
-                  disabled: true,
-                };
-              }
               return {
                 ...field,
                 options: proveedores.map((p) => ({
@@ -77,16 +45,6 @@ export default function ReparacionesNuevo() {
             return field;
           })
         );
-        setInitialValues({
-          ...(incidenciaPreseleccionada?.id && {
-            incidenciaId: incidenciaPreseleccionada.id,
-            incidenciaCodigo: incidenciaPreseleccionada.codigo,
-          }),
-          ...(proveedorPreseleccionado?.id && {
-            proveedorId: proveedorPreseleccionado.id,
-            proveedorCodigo: proveedorPreseleccionado.codigo,
-          }),
-        });
       } catch {
         setError({
           message: "No pudieron obtenerse las opciones para los campos",
@@ -94,7 +52,7 @@ export default function ReparacionesNuevo() {
       }
     }
     fetchOptions();
-  }, [incidenciaPreseleccionada, proveedorPreseleccionado]);
+  }, []);
 
   const handleSubmit = async (data) => {
     setIsSubmitting(true);
@@ -121,7 +79,6 @@ export default function ReparacionesNuevo() {
     <EntityForm
       entityName="reparacion"
       fields={fields}
-      initialValues={initialValues}
       onSubmit={handleSubmit}
       onCancel={() => navigate("/incidencias/reparaciones")}
       error={error}

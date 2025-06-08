@@ -3,7 +3,7 @@ import Sidebar from "./Sidebar";
 import Header from "./Header";
 import { useState } from "react";
 
-const Layout = ({ pathToTitle, sidebarItems }) => {
+const Layout = ({ pathToTitle, sidebarItems, sidebarProps }) => {
   const location = useLocation();
   const [sidebarState, setSidebarState] = useState("open");
 
@@ -21,7 +21,7 @@ const Layout = ({ pathToTitle, sidebarItems }) => {
       />
       <div className="flex flex-1 min-h-0">
         {sidebarState !== "closed" && (
-          <Sidebar collapsed={sidebarState === "collapsed"} navItems={sidebarItems} />
+          <Sidebar collapsed={sidebarState === "collapsed"} navItems={sidebarItems} {...(sidebarProps || {})} />
         )}
         <div className="flex flex-col flex-1 min-w-0 overflow-x-auto">
           <main className="p-6 min-w-[576px]">

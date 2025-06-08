@@ -16,8 +16,7 @@ export default function Login() {
     setError("");
     try {
       await login(form);
-    // eslint-disable-next-line no-unused-vars
-    } catch (error) {
+    } catch {
       setError("Nombre o contraseña incorrectos");
     }
   };
@@ -36,12 +35,10 @@ export default function Login() {
 
       <div className="p-10 xs:p-0 mx-auto md:w-full md:max-w-md z-10">
         <h1 className="font-bold text-center text-3xl text-purple-600 mb-6">
-          Logotipo
+          Gestión Inmobiliaria S.L.
         </h1>
-
         <div className="bg-white shadow w-full rounded-lg divide-y divide-gray-200">
           <form onSubmit={handleSubmit} className="px-6 py-8 space-y-6">
-            {/* Usuario */}
             <div>
               <label className="font-semibold text-base text-gray-700 pb-1 block">
                 Usuario
@@ -59,8 +56,6 @@ export default function Login() {
                 />
               </div>
             </div>
-
-            {/* Contraseña */}
             <div>
               <label className="font-semibold text-base text-gray-700 pb-1 block">
                 Contraseña
@@ -78,11 +73,9 @@ export default function Login() {
                 />
               </div>
             </div>
-
-            {/* Botón */}
             <button
               type="submit"
-              className="transition duration-200 bg-purple-600 hover:bg-purple-700 text-white w-full py-3 rounded-lg text-base font-semibold shadow-sm hover:shadow-md"
+              className="transition duration-200 bg-purple-600 hover:bg-purple-700 text-white w-full py-3 rounded-lg text-base font-semibold shadow-sm hover:shadow-md cursor-pointer"
             >
               Iniciar sesión
             </button>

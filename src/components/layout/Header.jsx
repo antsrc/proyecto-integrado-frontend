@@ -46,8 +46,9 @@ export default function Header({ onToggleSidebar, sidebarState }) {
           <PanelLeftOpen className="w-5 h-5" />
         </button>
       </div>
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-        <h1 className="text-2xl font-bold text-purple-600">Logotipo</h1>
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 max-w-[70vw] whitespace-nowrap overflow-hidden text-ellipsis hidden md:flex items-center gap-2">
+        <img src="/finalicon.svg" alt="Logo" className="h-7 w-7 object-contain" />
+        <h1 className="text-2xl font-bold text-purple-600">Gestión Inmobiliaria S.L.</h1>
       </div>
       <div className="relative" ref={dropdownRef}>
         <button

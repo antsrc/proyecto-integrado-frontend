@@ -1,6 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { Search } from "lucide-react";
+import NotificationBox from "../../../components/template/NotificationBox";
 
 function diasHasta(fechaBaja) {
   const hoy = new Date();
@@ -16,36 +15,21 @@ function diasHasta(fechaBaja) {
 }
 
 export function AlquileresBox({ alquileresFinalizando }) {
-  const navigate = useNavigate();
-  // Ordenar de los que terminan antes a los que terminan después
   const ordenados = [...(alquileresFinalizando || [])].sort((a, b) => {
     const fechaA = new Date(a.fechaBaja);
     const fechaB = new Date(b.fechaBaja);
     return fechaA - fechaB;
   });
   return (
-    <div className="bg-white rounded-lg px-6 py-6 shadow-sm">
-      <h2 className="text-lg font-semibold mb-4">Alquileres finalizando</h2>
-      {ordenados.length > 0 ? (
-        <ul className="divide-y divide-gray-100">
-          {ordenados.map((a, i) => (
-            <li key={i} className="py-2 flex items-center gap-4">
-              <button
-                className="text-gray-500 hover:text-blue-600 focus:outline-none"
-                title="Buscar este alquiler"
-                onClick={() => navigate("/alquileres", { state: { searchDefault: a.codigo } })}
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <Search size={18} className="mr-1" />
-              </button>
-              <span className="font-mono text-sm text-gray-700">{a.codigo || '-'}</span>
-              <span className="text-xs text-gray-500">{diasHasta(a.fechaBaja)}</span>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="text-gray-500 text-sm">No hay alquileres finalizando.</p>
-      )}
-    </div>
+    <NotificationBox
+      title="Alquileres finalizando"
+      items={ordenados}
+      emptyText={<div className="text-gray-400 text-sm py-8 text-center">En estos momentos no hay alquileres finalizando</div>}
+      getCode={a => a.codigo || '-'}
+      getSecondary={a => diasHasta(a.fechaBaja)}
+      getNavigateTo={() => "/alquileres"}
+      getNavigateState={a => ({ state: { searchDefault: a.codigo } })}
+      getButtonTitle={() => "Buscar este alquiler"}
+    />
   );
 }

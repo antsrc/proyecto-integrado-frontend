@@ -28,9 +28,6 @@ const EntityForm = forwardRef(function EntityForm(
     buildInitialState(fields, initialValues)
   );
   const [activeFields, setActiveFields] = useState(() => {
-    // Por defecto, los campos required están activos.
-    // Si es edición, los no required activos solo si el valor inicial no es null/undefined/"".
-    // Si es nuevo, los no required salen desactivados ("Sin datos" marcado).
     return fields.reduce((acc, field) => {
       if (field.required) {
         acc[field.name] = true;
@@ -43,11 +40,12 @@ const EntityForm = forwardRef(function EntityForm(
   });
   const [showConfirmUpload, setShowConfirmUpload] = useState(false);
   const [pendingFile, setPendingFile] = useState(null);
+  const [validationToast, setValidationToast] = useState(null);
 
   const prevInitialValuesRef = useRef(initialValues);
+  const prevInitialValuesRefActiveFields = useRef(initialValues);
 
   useEffect(() => {
-    // Solo actualizar formValues si initialValues realmente cambian respecto a los previos
     const prevInitialValues = prevInitialValuesRef.current;
     const prevString = JSON.stringify(buildInitialState(fields, prevInitialValues));
     const nextString = JSON.stringify(buildInitialState(fields, initialValues));
@@ -58,8 +56,10 @@ const EntityForm = forwardRef(function EntityForm(
   }, [initialValues, fields]);
 
   useEffect(() => {
-    // Actualizar activeFields si initialValues cambia (edición)
-    if (initialValues && Object.keys(initialValues).length > 0) {
+    const prevInitialValues = prevInitialValuesRefActiveFields.current;
+    const prevString = JSON.stringify(buildInitialState(fields, prevInitialValues));
+    const nextString = JSON.stringify(buildInitialState(fields, initialValues));
+    if (prevString !== nextString) {
       setActiveFields(
         fields.reduce((acc, field) => {
           if (field.required) {
@@ -71,8 +71,8 @@ const EntityForm = forwardRef(function EntityForm(
           return acc;
         }, {})
       );
+      prevInitialValuesRefActiveFields.current = initialValues;
     }
-    // eslint-disable-next-line
   }, [initialValues, fields]);
 
   const handleChange = (e, name) => {
@@ -85,7 +85,6 @@ const EntityForm = forwardRef(function EntityForm(
   const handleToggleField = (name) => {
     setActiveFields((prev) => {
       const next = { ...prev, [name]: !prev[name] };
-      // Si se activa "Sin datos" (es decir, el campo se desactiva), poner valor a null
       if (!next[name]) {
         setFormValues((fv) => ({ ...fv, [name]: "" }));
       }
@@ -95,8 +94,18 @@ const EntityForm = forwardRef(function EntityForm(
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const missingRequiredSelect = fields.some(
+      (field) =>
+        field.type === "select" &&
+        field.required &&
+        activeFields[field.name] &&
+        (!formValues[field.name] || formValues[field.name] === "")
+    );
+    if (missingRequiredSelect) {
+      setValidationToast({ type: "warning", message: "Existen opciones sin selección" });
+      return;
+    }
     if (onSubmit) {
-      // Filtrar campos no activos: enviar null si el campo está desactivado
       const filteredValues = { ...formValues };
       Object.keys(activeFields).forEach((key) => {
         if (!activeFields[key]) filteredValues[key] = null;
@@ -104,10 +113,8 @@ const EntityForm = forwardRef(function EntityForm(
       if (initialValues && Object.keys(initialValues).length > 0) {
         const dirtyFields = {};
         for (const key in filteredValues) {
-          // Comprobar nulls correctamente
           const initial = initialValues?.[key];
           const current = filteredValues[key];
-          // Considerar null, undefined y "" como equivalentes para null
           const isInitialNull = initial === null || initial === undefined || initial === "";
           const isCurrentNull = current === null || current === undefined || current === "";
           if (isInitialNull !== isCurrentNull || (!isCurrentNull && current !== initial)) {
@@ -139,7 +146,6 @@ const EntityForm = forwardRef(function EntityForm(
     }, {});
   }
 
-  // ModalConfirm reutilizable dentro de EntityForm
   function ModalConfirm({ open, icon, title, description, children, onCancel, onConfirm, confirmText = "Confirmar", cancelText = "Cancelar", confirmColor = "bg-red-600 hover:bg-red-700", loading = false, disabled = false }) {
     if (!open) return null;
     return (
@@ -274,6 +280,9 @@ const EntityForm = forwardRef(function EntityForm(
 
   return (
     <>
+      {validationToast && (
+        <Toast type={validationToast.type} message={validationToast.message} onClose={() => setValidationToast(null)} />
+      )}
       <form onSubmit={handleSubmit} className="space-y-6">
         {error &&
           (Array.isArray(error?.message) ? (
@@ -315,7 +324,6 @@ const EntityForm = forwardRef(function EntityForm(
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {field.label}
               </label>
-              {/* Checkbox para campos no required */}
               {!field.required && (
                 <label className="flex items-center gap-2 mb-1 text-xs text-gray-500">
                   <input
@@ -341,7 +349,7 @@ const EntityForm = forwardRef(function EntityForm(
                       ...base,
                       minHeight: '38px',
                       borderColor: state.isFocused ? '#000' : '#d1d5db',
-                      borderWidth: 1, // Siempre 1px, incluso en focus
+                      borderWidth: 1,
                       boxShadow: 'none',
                       outline: 'none',
                       backgroundColor: (field.disabled && isEdit) || !activeFields[field.name] ? '#f3f4f6' : '#fff',
@@ -367,12 +375,12 @@ const EntityForm = forwardRef(function EntityForm(
                     ...theme,
                     colors: {
                       ...theme.colors,
-                      primary: '#f3f4f6', // fondo opción seleccionada y hover
-                      primary25: '#f3f4f6', // hover/focus fondo opción
+                      primary: '#f3f4f6',
+                      primary25: '#f3f4f6',
                       primary50: '#f3f4f6',
-                      neutral10: '#f3f4f6', // fondo de la opción seleccionada
-                      neutral20: '#d1d5db', // borde normal
-                      neutral30: '#000', // borde focus
+                      neutral10: '#f3f4f6',
+                      neutral20: '#d1d5db',
+                      neutral30: '#000',
                     },
                   })}
                   isClearable={!field.required}

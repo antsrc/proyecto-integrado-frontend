@@ -36,14 +36,12 @@ export default function EntityTable({ title, columns, data, status, searchDefaul
   });
   const [globalFilter, setGlobalFilter] = useState(searchDefault);
   useEffect(() => {
-    // Si cambia la prop searchDefault y el usuario no ha escrito nada, la aplicamos
     setGlobalFilter((prev) => (prev ? prev : searchDefault));
   }, [searchDefault]);
   const [rowSelection, setRowSelection] = useState({});
   const [showToast, setShowToast] = useState(false);
   const [navigationToast, setNavigationToast] = useState(null);
 
-  // Detecta la primera columna booleana (si existe)
   const booleanCol = columns.find((col) => col.type === "boolean");
   const [booleanFilter, setBooleanFilter] = useState(() => {
     if (!booleanCol) return "all";
@@ -52,13 +50,11 @@ export default function EntityTable({ title, columns, data, status, searchDefaul
       if (booleanSearchDefault[booleanCol.id] === false) return "false";
     }
     return "all";
-  }); // all | true | false
+  });
 
-  // Detecta la primera columna de documento (factura, contrato, etc)
   const docCol = columns.find((col) => col.type === "doc");
-  const [docFilter, setDocFilter] = useState(() => docSearchDefault || "all"); // all | with | without
+  const [docFilter, setDocFilter] = useState(() => docSearchDefault || "all");
 
-  // Filtra los datos según el filtro booleano
   const filteredData = React.useMemo(() => {
     let d = data;
     if (booleanCol && booleanFilter !== "all") {
@@ -106,16 +102,13 @@ export default function EntityTable({ title, columns, data, status, searchDefaul
     if (value == null || value === "") return "";
     const number = parseFloat(value);
     if (isNaN(number)) return value;
-    // Redondea a dos decimales y separa parte entera y decimal
     const [entero, decimales] = number
       .toFixed(2)
       .split(".");
-    // Inserta puntos cada tres cifras desde la derecha, incluso para cuatro cifras
     const enteroConPuntos = entero.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     return `${enteroConPuntos},${decimales}`;
   };
 
-  // Utilidad para formatear fecha a dd-mm-yyyy SOLO para mostrar y buscar
   const formatDateES = (value) => {
     if (!value) return "";
     if (/^\d{2}-\d{2}-\d{4}$/.test(value)) return value;
@@ -124,7 +117,6 @@ export default function EntityTable({ title, columns, data, status, searchDefaul
     return value;
   };
 
-  // Filtrado global personalizado: busca en campos string y fechas (dd-mm-yyyy), ignora columnas number
   const customFilteredData = React.useMemo(() => {
     if (!globalFilter) return filteredData;
     const filter = globalFilter.toLowerCase();
@@ -135,7 +127,6 @@ export default function EntityTable({ title, columns, data, status, searchDefaul
           return formatDateES(value).toLowerCase().includes(filter);
         }
         if (col.type === "number") {
-          // Ignora columnas numéricas en la búsqueda global
           return false;
         }
         return String(value ?? "").toLowerCase().includes(filter);
@@ -174,7 +165,6 @@ export default function EntityTable({ title, columns, data, status, searchDefaul
       cell: ({ getValue }) => {
         let value = getValue();
         if (col.type === "number") {
-          // Solo convierte a número si el valor es numérico o string numérico, sin manipular separadores
           const num = typeof value === "number" ? value : (value !== null && value !== undefined && value !== "" && !isNaN(Number(value))) ? Number(value) : value;
           return formatNumberES(num);
         }
@@ -335,7 +325,7 @@ export default function EntityTable({ title, columns, data, status, searchDefaul
 
       <div className="bg-white px-4 pt-6 pb-4 rounded-lg overflow-x-auto shadow-sm">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 pl-2">
             <input
               type="text"
               placeholder="Buscar..."
@@ -370,7 +360,7 @@ export default function EntityTable({ title, columns, data, status, searchDefaul
           </div>
           <button
             onClick={handleExport}
-            className="flex items-center px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md cursor-pointer"
+            className="flex items-center px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md cursor-pointer ml-2"
           >
             <Download className="w-4 h-4 mr-2" />
             Exportar CSV

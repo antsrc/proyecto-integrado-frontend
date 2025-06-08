@@ -38,6 +38,7 @@ export default function Toast({ type, message, onClose }) {
   return (
     <div
       className={`fixed bottom-4 right-4 rounded-md px-3.5 py-2.5 text-white flex items-center justify-between gap-3 min-w-[260px] shadow-sm ${bgColors[type]}`}
+      style={{ zIndex: 9999 }}
     >
       <div className="flex items-center gap-2">
         {icons[type]}

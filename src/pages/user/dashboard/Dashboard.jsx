@@ -6,6 +6,7 @@ import { IncidenciasBox } from "./IncidenciasBox";
 import { MensualidadesBox } from "./MensualidadesBox";
 import { AlquileresBox } from "./AlquileresBox";
 import { DocumentosBox } from "./DocumentosBox";
+import Loading from "../../../components/utils/Loading";
 
 export default function UserDashboard() {
   const { user, loading } = useAuth();
@@ -26,21 +27,18 @@ export default function UserDashboard() {
         setLoadingIncidencias(false);
       })
       .catch(() => {
-        setError("Error cargando incidencias");
+        setError("Error cargando los datos");
         setLoadingIncidencias(false);
       });
   }, []);
 
-  if (loading) return <p>Cargando sesión...</p>;
+  if (loading) return <Loading texto="Cargando..." />;
   if (!user) return <p>No estás autenticado</p>;
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">
-        Bienvenido al Dashboard 👋
-      </h1>
       {loadingIncidencias ? (
-        <p>Cargando incidencias...</p>
+        <Loading texto="Cargando..." />
       ) : error ? (
         <p className="text-red-600">{error}</p>
       ) : (

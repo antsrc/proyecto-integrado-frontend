@@ -1,7 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "../pages/Login";
 import Dashboard from "../pages/user/dashboard/Dashboard";
-import AdminDashboard from "../pages/admin/AdminDashboard";
 import NotFound from "../pages/NotFound";
 import PrivateRoute from "./PrivateRoute";
 import PublicOnlyRoute from "./PublicOnlyRoute";
@@ -134,7 +133,6 @@ export default function AppRouter() {
           </PrivateRoute>
         }
       >
-        <Route path="/admin" index element={<AdminDashboard />} />
         <Route path="/usuarios" element={<Users />} />
         <Route path="/audit-logs" element={<AuditLogs />} />
         <Route path="/error-logs" element={<ErrorLogs />} />

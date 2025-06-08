@@ -1,9 +1,7 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { Search } from "lucide-react";
+import NotificationBox from "../../../components/template/NotificationBox";
 
 export function DocumentosBox({ registrosSinDocumento }) {
-  const navigate = useNavigate();
   if (!registrosSinDocumento) return null;
   const items = [
     {
@@ -35,29 +33,19 @@ export function DocumentosBox({ registrosSinDocumento }) {
       docType: "without"
     },
   ];
+  const filtered = items.filter(item => item.count > 0);
+  const total = filtered.reduce((acc, item) => acc + (item.count || 0), 0);
   return (
-    <div className="bg-white rounded-lg px-6 py-6 shadow-sm">
-      <h2 className="text-lg font-semibold mb-4">Registros sin documento</h2>
-      <ul className="divide-y divide-gray-100">
-        {items.map((item) =>
-          item.count > 0 ? (
-            <li key={item.key} className="py-2 flex items-center gap-4">
-              <button
-                className="text-gray-500 hover:text-blue-600 focus:outline-none"
-                title="Filtrar sin documento"
-                onClick={() => navigate(item.path, { state: { docSearchDefault: "without" } })}
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <Search size={18} className="mr-1" />
-              </button>
-              <span className="text-sm text-gray-700">{item.label(item.count)}</span>
-            </li>
-          ) : null
-        )}
-        {items.every(item => item.count === 0) && (
-          <li className="py-2 text-gray-500 text-sm">No hay registros pendientes.</li>
-        )}
-      </ul>
-    </div>
+    <NotificationBox
+      title="Registros sin documento"
+      items={filtered}
+      emptyText={<div className="text-gray-400 text-sm py-8 text-center">En estos momentos no hay registros sin documento</div>}
+      getCode={item => item.label(item.count).replace(/\d+ (alquiler(es)?|mensualidad(es)?|reparaci[oó]n(es)?|reforma(s)?)/i, item.key.charAt(0).toUpperCase() + item.key.slice(1))}
+      getSecondary={item => `${item.count} ${item.label(item.count).match(/sin (contrato|factura)/)?.[0] || ''}`}
+      getNavigateTo={item => item.path}
+      getNavigateState={() => ({ state: { docSearchDefault: "without" } })}
+      getButtonTitle={() => "Filtrar sin documento"}
+      notificationCount={total}
+    />
   );
 }

@@ -32,8 +32,8 @@ export default function Subnav({ items }) {
               className={() =>
                 `relative inline-block pb-3 transition-colors duration-200 ${
                   isTabActive(to)
-                    ? "text-black after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-black"
-                    : "hover:text-gray-800"
+                    ? "text-purple-700 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-purple-700"
+                    : "hover:text-purple-700"
                 }`
               }
               end

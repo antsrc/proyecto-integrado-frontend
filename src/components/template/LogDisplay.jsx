@@ -26,7 +26,6 @@ export default function LogDisplay({ title, fetchLog }) {
     }
   };
 
-  // Intenta formatear cada línea como JSON si showJson está activo
   let formattedJsonLines = null;
   let localJsonError = null;
   if (showJson && !loading && !error && lines.length > 0) {
@@ -44,12 +43,10 @@ export default function LogDisplay({ title, fetchLog }) {
     localJsonError = anyError ? "Algunas líneas no son JSON válido" : null;
   }
 
-  // Función para descargar el log mostrado
   const handleDownload = () => {
     let content = "";
-    let filename = title.toLowerCase().replace(/ /g, "-") + "-log.txt";
+    let filename = title.toLowerCase().replace(/ /g, "-") + ".txt";
     if (showJson && formattedJsonLines) {
-      // Si está en modo JSON, descarga todos los JSON formateados juntos
       content = formattedJsonLines
         .map((el) => {
           if (el && el.type === "pre") return el.props.children;
@@ -83,7 +80,7 @@ export default function LogDisplay({ title, fetchLog }) {
           <input
             type="number"
             min={1}
-            max={1000}
+            max={100}
             className="border border-gray-300 rounded px-3 py-2 w-24 text-base"
             value={n}
             onChange={e => setN(Number(e.target.value))}
@@ -91,7 +88,7 @@ export default function LogDisplay({ title, fetchLog }) {
         </div>
         <button
           type="submit"
-          className="ml-auto px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded font-medium shadow disabled:opacity-50"
+          className="ml-auto px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md font-medium shadow disabled:opacity-50 cursor-pointer"
           disabled={loading}
         >
           Ver log
@@ -102,14 +99,14 @@ export default function LogDisplay({ title, fetchLog }) {
           <>
             <button
               type="button"
-              className={`px-3 py-1 rounded text-xs font-medium border transition-colors ${showJson ? "bg-purple-600 text-white border-purple-600" : "bg-white text-purple-700 border-purple-300 hover:bg-purple-50"}`}
+              className="px-3 py-1 rounded-md text-xs font-medium border border-purple-300 bg-white text-purple-700 hover:bg-purple-50 transition-colors cursor-pointer"
               onClick={() => { setShowJson((v) => !v); setJsonError(null); }}
             >
               {showJson ? "Ver texto plano" : "Formatear JSON"}
             </button>
             <button
               type="button"
-              className="px-3 py-1 rounded text-xs font-medium border bg-gray-100 text-gray-700 hover:bg-gray-200"
+              className="px-3 py-1 rounded-md text-xs font-medium border bg-gray-100 text-gray-700 hover:bg-gray-200 cursor-pointer"
               onClick={handleDownload}
             >
               Descargar
@@ -117,24 +114,25 @@ export default function LogDisplay({ title, fetchLog }) {
           </>
         )}
       </div>
-      <div className="bg-white rounded-lg shadow p-4 min-h-[200px] max-h-[500px] overflow-auto font-mono text-xs text-gray-800 whitespace-pre-wrap border border-gray-100">
-        {loading ? (
-          <div className="flex justify-center py-10"><Loading /></div>
-        ) : error ? (
-          <div className="text-red-500 text-center py-10">{error}</div>
-        ) : showJson && formattedJsonLines ? (
-          <>
-            {localJsonError && <div className="text-red-500 text-center pb-2">{localJsonError}</div>}
-            {formattedJsonLines}
-          </>
-        ) : showJson && jsonError ? (
-          <div className="text-red-500 text-center py-10">{jsonError}</div>
-        ) : lines.length > 0 ? (
-          lines.map((line, i) => <div key={i}>{line}</div>)
-        ) : (
-          <div className="text-gray-400 text-center py-10">No hay datos</div>
-        )}
-      </div>
+      {/* Solo mostrar la caja si hay algo que ver */}
+      {(loading || error || lines.length > 0) && (
+        <div className="bg-white rounded-lg shadow p-4 min-h-[200px] max-h-[500px] overflow-auto font-mono text-xs text-gray-800 whitespace-pre-wrap border border-gray-100">
+          {loading ? (
+            <div className="flex justify-center py-10"><Loading /></div>
+          ) : error ? (
+            <div className="text-red-500 text-center py-10">{error}</div>
+          ) : showJson && formattedJsonLines ? (
+            <>
+              {localJsonError && <div className="text-red-500 text-center pb-2">{localJsonError}</div>}
+              {formattedJsonLines}
+            </>
+          ) : showJson && jsonError ? (
+            <div className="text-red-500 text-center py-10">{jsonError}</div>
+          ) : lines.length > 0 ? (
+            lines.map((line, i) => <div key={i}>{line}</div>)
+          ) : null}
+        </div>
+      )}
     </div>
   );
 }

@@ -8,7 +8,7 @@ export default function PublicOnlyRoute({ children }) {
   if (loading) return <SessionLoading />;
 
   if (user) {
-    const redirectPath = user.rol === "user" ? "/inicio" : "/admin";
+    const redirectPath = user.rol === "user" ? "/inicio" : "/usuarios";
     return <Navigate to={redirectPath} replace />;
   }
 

@@ -3,7 +3,7 @@ import EntitySubnav from "../../../components/template/EntitySubnav";
 import { Home, Plus, FileText } from "lucide-react";
 
 const items = [
-  { label: "Listado", to: "." },
+  { label: "Alquileres", to: "." },
   { label: "Mensualidades", to: "mensualidades"},
 ];
 

@@ -19,7 +19,7 @@ const defaultNavItems = [
   { name: "Reformas", icon: Hammer, path: "/reformas" }
 ];
 
-export default function Sidebar({ collapsed, navItems }) {
+export default function Sidebar({ collapsed, navItems, showDivider = true }) {
   const location = useLocation();
   const items = navItems || defaultNavItems;
   const homeItem = items.find(i => i.isHome);
@@ -47,7 +47,7 @@ export default function Sidebar({ collapsed, navItems }) {
             </NavLink>
           )}
         </div>
-        <div className="h-[1px] bg-gray-200 mx-4 my-3" />
+        {showDivider && <div className="h-[1px] bg-gray-200 mx-4 my-3" />}
         <div className="space-y-[6px] px-4">
           {items
             .filter((item) => !item.isHome)
