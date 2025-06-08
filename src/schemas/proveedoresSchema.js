@@ -15,5 +15,5 @@ export const proveedoresFields = [
   { name: "tipo", label: "Tipo", type: "text", maxLength: 30, required: true },
   { name: "direccion", label: "Dirección", type: "text", maxLength: 75, required: true },
   { name: "telefono", label: "Teléfono", type: "text", maxLength: 30, required: true },
-  { name: "descripcion", label: "Descripción", type: "text", maxLength: 100, required: true },
+  { name: "descripcion", label: "Descripción", type: "text", maxLength: 200, required: true },
 ];
