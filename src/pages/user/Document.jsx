@@ -1,12 +1,15 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import NotFound from "../NotFound";
+import { API_URL } from "../../config/env";
 
 export default function Document() {
   const { id, type } = useParams();
-  const url = type === "alquileres"
-    ? `http://localhost:3000/uploads/contratos/${id}.pdf`
-    : `http://localhost:3000/uploads/facturas/${type}/${id}.pdf`;
+  const baseUrl = API_URL.replace(/\/api$/, "");
+  const url =
+    type === "alquileres"
+      ? `${baseUrl}/uploads/contratos/${id}.pdf`
+      : `${baseUrl}/uploads/facturas/${type}/${id}.pdf`;
   const [exists, setExists] = useState(null);
 
   useEffect(() => {
@@ -18,7 +21,9 @@ export default function Document() {
       .catch(() => {
         if (!cancelled) setExists(false);
       });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [url]);
 
   if (exists === false) return <NotFound />;
