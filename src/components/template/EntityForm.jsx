@@ -464,8 +464,8 @@ const EntityForm = forwardRef(function EntityForm(
         <ModalConfirm
           open={showConfirmUpload}
           icon={<FilePenLine className="w-12 h-12 text-purple-600" />}
-          title="Ya existe un contrato PDF"
-          description="¿Desea sobrescribir el contrato actual?"
+          title="Ya existe un documento PDF"
+          description="¿Desea sobrescribir el documento actual?"
           onCancel={handleCancelUpload}
           onConfirm={handleConfirmUpload}
           confirmText="Sobrescribir"

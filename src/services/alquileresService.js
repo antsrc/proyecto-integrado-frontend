@@ -1,4 +1,5 @@
 import api from '../config/axios';
+import { API_URL } from '../config/env';
 
 export async function getAlquileres() {
   try {
@@ -51,7 +52,8 @@ export async function getIdsConContrato() {
 
 export async function existsContrato(id) {
   try {
-    const url = `http://localhost:3000/uploads/contratos/${id}.pdf`;
+    const baseUrl = API_URL.replace(/\/api$/, "");
+    const url = `${baseUrl}/uploads/contratos/${id}.pdf`;
     const response = await fetch(url, { method: "HEAD" });
     return response.ok;
   } catch {

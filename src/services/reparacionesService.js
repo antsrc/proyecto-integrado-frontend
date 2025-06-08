@@ -1,4 +1,5 @@
 import api from '../config/axios';
+import { API_URL } from '../config/env';
 
 export async function getReparaciones() {
   try {
@@ -51,7 +52,8 @@ export async function getIdsConFactura() {
 
 export async function existsFactura(id) {
   try {
-    const url = `http://localhost:3000/uploads/facturas/reparaciones/${id}.pdf`;
+    const baseUrl = API_URL.replace(/\/api$/, "");
+    const url = `${baseUrl}/uploads/facturas/reparaciones/${id}.pdf`;
     const response = await fetch(url, { method: "HEAD" });
     return response.ok;
   } catch {
